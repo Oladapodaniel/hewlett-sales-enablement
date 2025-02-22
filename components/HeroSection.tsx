@@ -1,8 +1,5 @@
 'use client'
 
-
-
-import { banner_bg } from '@/lib/images'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { Input } from "@/components/ui/input"
@@ -10,14 +7,12 @@ import { Button } from "@/components/ui/button"
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
 import { PaperPlaneIcon } from '@radix-ui/react-icons'
 import { Badge } from './ui/badge'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from './ui/select'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Separator } from "@/components/ui/separator"
 import { themes, ThemesInterface } from '@/constants/placeholder'
@@ -31,7 +26,7 @@ const HeroSection = () => {
     const router = useRouter();
 
     const themeContext = useTheme();
-    const { selectedTheme, setSelectedTheme } = themeContext;
+    const { setSelectedTheme } = themeContext;
     const examplePrompts = [
         'Key Strategies for Remote Team Collaboration',
         'Building an Effective Sales Team',

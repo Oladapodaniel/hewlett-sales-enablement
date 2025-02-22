@@ -3,8 +3,6 @@
 import BodyPageOne from '@/components/themes/purple_theme/BodyPageOne';
 import EndPageProps from '@/components/themes/purple_theme/EndPage';
 import StartPage from '@/components/themes/purple_theme/StartPage';
-import { head } from 'framer-motion/client';
-// import { Button } from '@/components/ui/button';
 import React from 'react';
 
 const Page: React.FC = () => {
@@ -125,7 +123,7 @@ const Page: React.FC = () => {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [currentSlide]);
+    }, [currentSlide, purple_theme.slides.length]);
 
     return (
         <div>

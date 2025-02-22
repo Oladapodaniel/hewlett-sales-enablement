@@ -1,7 +1,7 @@
 'use client'
 
 import { useTheme } from '@/context/ThemeContext';
-import { second_slide_image, start_deck_bg } from '@/lib/images';
+import { second_slide_image } from '@/lib/images';
 import Image from 'next/image';
 import React from 'react';
 import { motion } from 'framer-motion';

@@ -1,7 +1,6 @@
 import React from "react";
 import StartPage from "./StartPage";
 import BodyPageOne from "./BodyPageOne";
-import { ThemesInterface } from "@/constants/placeholder";
 import Image from "next/image";
 import { purple_theme_thumbnail, purple_theme_thumbnail_2 } from "@/lib/images";
 import EndPageProps from "./EndPage";
