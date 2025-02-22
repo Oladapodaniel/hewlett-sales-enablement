@@ -55,12 +55,12 @@ export interface ThemesInterface {
                 to: string
             }
         },
-        header2?: {
+        header2: {
             text: string,
             fontSize: string,
             fontWeight: string
         },
-        body2?: {
+        body2: {
             text: string,
             fontSize: string
         },
@@ -131,8 +131,17 @@ export const themes: ThemesInterface[] = [
                     }
                 },
                 footer: {
-                    text: '20XX-XX-XX',
-                    fontSize: '4xl'
+                    text: '',
+                    fontSize: ''
+                },
+                header2: {
+                    text: '',
+                    fontSize: '',
+                    fontWeight: ''
+                },
+                body2: {
+                    text: '',
+                    fontSize: ''
                 },
                 bg: '../assets/img/start_deck_bg.png',
                 logo: 'YOUR LOGO',
@@ -219,6 +228,15 @@ export const themes: ThemesInterface[] = [
                     text: '20XX-XX-XX',
                     fontSize: '4xl'
                 },
+                header2: {
+                    text: '',
+                    fontSize: '',
+                    fontWeight: ''
+                },
+                body2: {
+                    text: '',
+                    fontSize: ''
+                },
                 bg: '../assets/img/start_deck_bg.png',
                 logo: 'YOUR LOGO',
                 logoFontSize: '4xl',
@@ -304,6 +322,15 @@ export const themes: ThemesInterface[] = [
                     text: '20XX-XX-XX',
                     fontSize: '4xl'
                 },
+                header2: {
+                    text: '',
+                    fontSize: '',
+                    fontWeight: ''
+                },
+                body2: {
+                    text: '',
+                    fontSize: ''
+                },
                 bg: '../assets/img/start_deck_bg.png',
                 logo: 'YOUR LOGO',
                 logoFontSize: '4xl',
@@ -388,6 +415,15 @@ export const themes: ThemesInterface[] = [
                 footer: {
                     text: '20XX-XX-XX',
                     fontSize: '4xl'
+                },
+                header2: {
+                    text: '',
+                    fontSize: '',
+                    fontWeight: ''
+                },
+                body2: {
+                    text: '',
+                    fontSize: ''
                 },
                 bg: '../assets/img/start_deck_bg.png',
                 logo: 'YOUR LOGO',

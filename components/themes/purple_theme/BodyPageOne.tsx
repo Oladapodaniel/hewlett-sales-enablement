@@ -66,6 +66,7 @@ const BodyPageOne: React.FC<BodyPageOneProps> = ({ mode }) => {
     const handleTitle2 = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newTitleText = event.target.value;
         if (selectedTheme === null) return;
+        
         setSelectedTheme((prevTheme) => {
             if (prevTheme === null) return null;
             return {
