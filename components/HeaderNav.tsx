@@ -6,13 +6,13 @@ import { logo } from '@/lib/images'
 const HeaderNav = () => {
   return (
     <div className="border">
-        <div className='container mx-auto flex justify-between py-5'>
+      <div className='container mx-auto flex justify-between py-5'>
         <Image
-            src={logo}
-            alt='logo'
+          src={logo}
+          alt='logo'
         />
         <Button className="rounded-[12px] bg-[#03A983]" type="submit">Log In</Button>
-    </div>
+      </div>
     </div>
   )
 }
