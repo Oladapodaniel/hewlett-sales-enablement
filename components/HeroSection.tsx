@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, ChangeEvent } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,14 +16,29 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { AnimatePresence, motion } from 'framer-motion'
 import { Separator } from "@/components/ui/separator"
 import { themes, ThemesInterface } from '@/constants/placeholder'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ClipboardPaste, ImportIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext'
+import DragAndDropUpload from './reusables/DragAndDropFileUpload'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Textarea } from './ui/textarea'
+import { salesforce_logo } from '@/lib/images'
+import ResizableTextArea from './reusables/ResizableTextArea'
+
 
 
 
 const HeroSection = () => {
     const router = useRouter();
+    const [value, setValue] = useState<string>('');
+
 
     const themeContext = useTheme();
     const { setSelectedTheme } = themeContext;
@@ -36,6 +51,7 @@ const HeroSection = () => {
 
     const [isThemeDisplayed, setIsThemeDisplayed] = useState<boolean>(false)
     const [allThemes, setallThemes] = useState<ThemesInterface[]>([])
+    const [isCustomerDataDisplayed, setIsCustomerDataDisplayed] = useState<boolean>(false)
 
     const chooseSelectedTheme = (index: number) => {
         setallThemes(prevThemes =>
@@ -44,13 +60,14 @@ const HeroSection = () => {
                 selected: i === index
             }))
         );
-        
+
         setSelectedTheme(allThemes[index])
     }
 
     useEffect(() => {
         setallThemes(themes)
     }, [themes])
+
     return (
         <section className="bg-[url('../assets/img/banner_bg.svg')] bg-no-repeat bg-center bg-top bg-cover flex flex-col items-center py-[62px] h-screen">
             <motion.h3
@@ -90,7 +107,7 @@ const HeroSection = () => {
                                         exit={{ opacity: 0, x: 80 }}
                                         transition={{ duration: 0.3 }}
                                     >
-                                        <CardTitle className='text-sm text-[30px] font-[500]'>Enter topic to generate slide</CardTitle>
+                                        <CardTitle className='text-sm text-[30px] font-[500]'>Describe which slide deck you need</CardTitle>
                                     </motion.div>
                                 ) : (
                                     <motion.div
@@ -118,24 +135,28 @@ const HeroSection = () => {
                                         transition={{ duration: 0.3 }}
                                     >
                                         <div className='relative mb-3'>
-                                            <Input className='p-[23px] rounded-[15px] border-2 border-[rgb(204_204_204)] focus-visible:ring-[#03A983]' type="text" placeholder="Key Strategies for Remote Team Collaboration" />
-                                            <Button onClick={() => setIsThemeDisplayed(!isThemeDisplayed)} className="absolute top-1 right-1 rounded-[12px] bg-[#03A983] shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit"><PaperPlaneIcon /></Button>
+                                            <ResizableTextArea
+                                                value={value}
+                                                onChange={(value: string) => setValue(value)}
+                                            />
+                                            {/* <Input className='p-[23px] rounded-[15px] border-2 border-[rgb(204_204_204)]' type="text" placeholder="Key Strategies for Remote Team Collaboration" /> */}
+                                            <Button onClick={() => router.push('/refine-request-topic')} className="absolute bottom-1 right-1 rounded-[12px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit"><PaperPlaneIcon /></Button>
                                         </div>
                                         <div>
-                                            <div className="">
+                                            <div className="space-x-2">
                                                 {examplePrompts.map((i, index) => (
-                                                    <Badge key={index} className="mt-2 bg-[#F5F5F5]" variant="secondary">{i}</Badge>
+                                                    <Badge key={index} className="mt-2 bg-[#F5F5F5] text-md font-[400] border border-primary bg-white" variant="secondary">{i}</Badge>
                                                 ))}
                                             </div>
                                         </div>
                                         <div>
                                             <Separator className='my-7' />
                                         </div>
-                                        <div className='flex gap-3'>
+                                        <div className='flex flex-wrap gap-3'>
                                             <div>
                                                 <div className='text-sm font-medium text-neutral-600 mb-1'>Pages</div>
                                                 <Select>
-                                                    <SelectTrigger className="w-[180px] h-8 bg-secondary border-none rounded-lg">
+                                                    <SelectTrigger className="w-[160px] bg-secondary border-none rounded-lg">
                                                         <SelectValue placeholder="Pages" />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -152,7 +173,7 @@ const HeroSection = () => {
                                             <div>
                                                 <div className='text-sm font-medium text-neutral-600 mb-1'>Output Language</div>
                                                 <Select>
-                                                    <SelectTrigger className="w-[180px] h-8 bg-secondary border-none rounded-lg">
+                                                    <SelectTrigger className="w-[160px] bg-secondary border-none rounded-lg">
                                                         <SelectValue placeholder="Language" />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -170,7 +191,7 @@ const HeroSection = () => {
                                             <div>
                                                 <div className='text-sm font-medium text-neutral-600 mb-1'>Tone</div>
                                                 <Select>
-                                                    <SelectTrigger className="w-[180px] h-8 bg-secondary border-none rounded-lg">
+                                                    <SelectTrigger className="w-[160px] bg-secondary border-none rounded-lg">
                                                         <SelectValue placeholder="Tone" />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -188,7 +209,7 @@ const HeroSection = () => {
                                             <div>
                                                 <div className='text-sm font-medium text-neutral-600 mb-1'>Audience</div>
                                                 <Select>
-                                                    <SelectTrigger className="w-[180px] h-8 bg-secondary border-none rounded-lg">
+                                                    <SelectTrigger className="w-[160px] bg-secondary border-none rounded-lg">
                                                         <SelectValue placeholder="Audience" />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -264,6 +285,63 @@ const HeroSection = () => {
                                 )
                                 }
                             </AnimatePresence>
+
+                            <Separator className='my-7' />
+                            <div className='flex gap-5'>
+                                <div>
+                                    <Dialog>
+                                        <DialogTrigger>
+                                            <div className='bg-secondary px-4 py-2 rounded-md flex gap-2 items-center'>
+                                                <ImportIcon />
+                                                Import files</div>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle className='text-2xl leading-tight'>Upload files</DialogTitle>
+                                                <DialogDescription className='text-lg font-[300] leading-[0.5]'>
+                                                    Drag and drop your files here or click to browse.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className='mt-5'>
+                                                <DragAndDropUpload />
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
+                                </div>
+                                <Dialog>
+                                    <DialogTrigger>
+                                        <div className='bg-secondary px-4 py-2 rounded-md flex gap-2 items-center'>
+                                            <ClipboardPaste />
+                                            Paste In Text</div>
+                                    </DialogTrigger>
+                                    <DialogContent className="h-[80%] min-w-[80%] flex items-start flex-col bg-gradient-to-tr from-white via-white to-green-100">
+                                        <DialogHeader>
+                                            <DialogTitle className='text-2xl leading-tight'>Paste in text</DialogTitle>
+                                            <DialogDescription className='text-lg font-[300] leading-[0.5]'>
+                                                Add the notes, outlines, or contents you'd like us to use.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className='mt-5 w-full h-full'>
+                                            <Textarea className='w-full h-full' placeholder='Enter your text here ...' />
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+
+                                <Select>
+                                    <SelectTrigger className="w-[180px]  bg-secondary border-none rounded-lg text-md">
+                                        <Image src={salesforce_logo} alt='logo' width={30} height={50} />
+                                        <SelectValue placeholder="Customer Data"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="apple">Andrew Beck - Anheuser-Busch Companies​</SelectItem>
+                                            <SelectItem value="banana">Sam Meyr - Ford Motor Company​</SelectItem>
+                                            <SelectItem value="blueberry">Dlynne Schade - Mc Donalds Inc.​</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
                         </CardContent>
                     </Card>
                 </motion.div>

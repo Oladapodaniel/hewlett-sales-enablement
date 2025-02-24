@@ -4,6 +4,7 @@ import start_deck_bg from "@/assets/img/start_deck_bg.png"
 import purple_theme_thumbnail from "@/assets/img/purple_theme_thumbnail.png"
 import second_slide_image from "@/assets/img/second_slide_image.png"
 import purple_theme_thumbnail_2 from "@/assets/img/purple_theme_thumbnail_2.png"
+import salesforce_logo from "@/assets/img/salesforce_logo.png"
 
 export {
     banner_bg,
@@ -11,5 +12,6 @@ export {
     start_deck_bg,
     purple_theme_thumbnail,
     second_slide_image,
-    purple_theme_thumbnail_2
+    purple_theme_thumbnail_2,
+    salesforce_logo
 }
