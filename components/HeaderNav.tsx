@@ -11,7 +11,7 @@ const HeaderNav = () => {
           src={logo}
           alt='logo'
         />
-        <Button className="rounded-[12px] bg-[#03A983]" type="submit">Log In</Button>
+        {/* <Button className="rounded-[12px] bg-[#03A983]" type="submit">Log In</Button> */}
       </div>
     </div>
   )

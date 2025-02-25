@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Skeleton } from "@/components/ui/skeleton"
 import { motion } from "framer-motion";
 import Spinner from '@/components/reusables/Spinner';
@@ -19,11 +19,14 @@ import {
 } from "@/components/ui/card"
 // import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import DraggableSection from '@/components/reusables/DragAndDropCards';
 
 const GenerateProposalPage: React.FC = () => {
     const [loading, setLoading] = React.useState(true);
     const [selectedTheme, setSelectedTheme] = React.useState("1");
-    const presentationOutline = [
+    const [sections, setSections] = useState([
         {
             title: "Introduction",
             content: [
@@ -81,7 +84,7 @@ const GenerateProposalPage: React.FC = () => {
                 'Their data centers are twice as energy-efficient as a typical enterprise data center.'
             ]
         },
-    ]
+    ])
 
     const contentThemes = [
         {
@@ -116,6 +119,18 @@ const GenerateProposalPage: React.FC = () => {
         },
     ]
 
+    function reorder(list: any[], startIndex: number, endIndex: number): any[] {
+        const result = [...list];
+        const [removed] = result.splice(startIndex, 1);
+        result.splice(endIndex, 0, removed);
+        return result;
+    }
+
+    const moveSection = (dragIndex: number, hoverIndex: number) => {
+        setSections((prev) => reorder(prev, dragIndex, hoverIndex));
+    };
+
+
     const headerRight = () => (
         <div className='flex items-center gap-3'>
             <div className='p-1 hover:bg-gray-100 rounded-full flex items-center justify-center'>
@@ -135,6 +150,11 @@ const GenerateProposalPage: React.FC = () => {
         </>
     )
 
+    const cardVariants = {
+        hidden: { opacity: 0, x: 30 },
+        visible: { opacity: 1, x: 0 }
+    };
+
     useEffect(() => {
         setTimeout(() => {
             setLoading(false);
@@ -145,12 +165,12 @@ const GenerateProposalPage: React.FC = () => {
             {
                 loading ? (
                     <main className="bg-gradient-to-t from-primary-foreground flex items-center justify-center w-full min-h-screen">
-                        <div className="flex flex-col items-center justify-center h-screen w-1/2">
+                        <div className="flex flex-col items-center justify-center h-screen md:w-1/2">
                             <motion.h3
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: .3 }}
-                                className="font-[500] bg-no-repeat bg-[50%] text-[60px] pt-[10px] px-[10px] pb-[10px] mt-8 text-center leading-[4rem]" style={{ backgroundPosition: 'right 70px' }}>Generating a proposal for the struture of the deck<Elipsis /></motion.h3>
+                                className="font-[500] bg-no-repeat bg-[50%] text-5xl md:text-[60px] pt-[10px] px-[10px] pb-[10px] mt-8 text-center leading-[4rem]" style={{ backgroundPosition: 'right 70px' }}>Generating a proposal for the struture of the deck<Elipsis /></motion.h3>
                             <div className='mt-10'>
                                 <Spinner />
                             </div>
@@ -159,17 +179,29 @@ const GenerateProposalPage: React.FC = () => {
                 ) : (
                     <main className='bg-gradient-to-t from-primary-foreground w-full min-h-screen'>
                         <div className="container mx-auto">
-                            <div className="grid grid-cols-2 gap-4 p-6">
-                                <div className="col-span-1">
+                            <div className="grid grid-cols-2 gap-4 py-6">
+                                <div className="col-span-2 md:col-span-1">
                                     <div>
                                         <div className='flex items-center gap-3 p-2 mb-5'>
                                             <SquareDashedMousePointer className="w-5 h-5 text-primary" />
-                                            <span className="font-bold text-xl">Choose your theme</span>
+                                            <motion.span
+                                                className="font-bold text-xl"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ duration: 0.5 }}
+                                            >Choose your theme</motion.span>
                                         </div>
-                                        <RadioGroup defaultValue={selectedTheme}>
-                                            <div className='flex flex-wrap gap-3'>
+                                        <RadioGroup value={selectedTheme} onValueChange={setSelectedTheme}>
+                                            <div className='flex flex-wrap justify-center md:justify-start gap-3'>
                                                 {contentThemes.map((theme, index) => (
-                                                    <div key={index}>
+                                                    <motion.div
+                                                        key={index}
+                                                        initial="hidden"
+                                                        variants={cardVariants}
+                                                        whileInView={{ opacity: 1, x: 0 }}
+                                                        transition={{ duration: 0.8, delay: (index + .5) * 0.2 }}
+                                                        viewport={{ once: true }}
+                                                    >
                                                         <Card className={`w-[350px] ${theme.selected === selectedTheme ? "border border-primary" : ""}`}>
                                                             <CardHeader>
                                                                 <CardTitle>{theme.name}</CardTitle>
@@ -182,20 +214,25 @@ const GenerateProposalPage: React.FC = () => {
                                                                 </div>
                                                             </CardContent>
                                                         </Card>
-                                                    </div>)
+                                                    </motion.div>)
                                                 )}
                                             </div>
                                         </RadioGroup>
                                     </div>
                                 </div>
-                                <div className="col-span-1">
-                                    <div className='flex items-center justify-between gap-3 mb-5'>
+                                <div className="col-span-2 md:col-span-1">
+                                    <div className='flex flex-col md:flex-row items-center justify-between gap-3 mb-5'>
                                         <div className='flex items-center gap-3'>
                                             <div className='flex items-center gap-3 p-2'>
                                                 <FileIcon className="w-5 h-5 text-primary" />
-                                                <span className="font-bold text-xl">Presentation Outline</span>
+                                                <motion.span
+                                                    className="font-bold text-xl"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    transition={{ duration: 0.5 }}
+                                                >Presentation Outline</motion.span>
                                             </div>
-                                            <div className='bg-secondary px-4 py-1 rounded-full'>9 Slides</div>
+                                            <div className='bg-secondary px-4 py-1 rounded-full'>{sections.length} Slides</div>
                                         </div>
                                         <div>
                                             <Button className="rounded-full text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">Generate Presentation
@@ -203,19 +240,44 @@ const GenerateProposalPage: React.FC = () => {
                                             </Button>
                                         </div>
                                     </div>
-                                    {presentationOutline.map((section, index) => (
-                                        <div key={index} className="p-2">
-                                            <CollapsibleElement
-                                                headerText={section.title}
-                                                headerRight={headerRight()}
-                                                collapsibleContent={collapsibleContent(section.content)}
-                                            />
+                                    <DndProvider backend={HTML5Backend}>
+                                        <div className="p-4">
+                                            {sections.map((section, index) => (
+                                                <DraggableSection
+                                                    key={index}
+                                                    section={section}
+                                                    index={index}
+                                                    moveSection={moveSection}
+                                                    cardVariants={cardVariants}
+                                                    headerRight={headerRight}
+                                                    collapsibleContent={collapsibleContent(section.content)}
+                                                />
+                                            ))}
                                         </div>
-                                    ))}
-                                    {/* The Content
-                        the header
-                        the fisrt column
-                        dragga ble feature */}
+                                    </DndProvider>
+
+                                    {/* {presentationOutline.map((section, index) => (
+                                        <DragAndDropCards key={index} items={section} >
+                                        </DragAndDropCards>
+                                    ))} */}
+                                    {/* {presentationOutline.map((section, index) => (
+                                        <motion.div key={index}
+                                        className="p-2"
+                                        initial="hidden"
+                                        variants={cardVariants}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        transition={{ duration: 0.8, delay: (index + .5) * 0.2 }}
+                                        viewport={{ once: true }}
+                                        >
+                                        <CollapsibleElement
+                                            key={index}
+                                            headerText={section.title}
+                                            headerRight={headerRight()}
+                                            collapsibleContent={collapsibleContent(section.content)}
+                                            defaultOpen={index === 0}
+                                        />
+                                        </motion.div>
+                                    ))} */}
                                 </div>
                             </div>
                             <div>
@@ -227,5 +289,7 @@ const GenerateProposalPage: React.FC = () => {
         </>
     );
 };
+
+
 
 export default GenerateProposalPage;

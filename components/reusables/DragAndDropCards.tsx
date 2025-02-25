@@ -1,144 +1,78 @@
-'use client';
+import { useRef } from "react";
+import { useDrag, useDrop } from "react-dnd";
+import { motion } from "framer-motion";
+import CustomCollapsible from "./Collapsible";
 
+const SECTION_TYPE = "SECTION";
 
-import React, { useState } from "react";
-import Draggable, {
-  DraggableEvent,
-  DraggableData,
-} from "react-draggable";
-import { Card, CardContent } from "@/components/ui/card";
-
-/**
- * A Sortable list using react-draggable.
- * This code uses a "controlled" position so that items reorder after dropping.
- *
- * Changes added:
- * 1) The dragged card now appears "above" others via z-index.
- * 2) When dropping the card, other items smoothly animate to their new positions.
- *
- * NOTE:
- * - "react-draggable" is more suited for free dragging.
- * - For fully dynamic, real-time reflow while dragging (like drag-and-drop libraries),
- *   you'd need more advanced logic.
- * - This example reorders only after the mouse is released.
- */
-
-interface RowData {
-  id: number;
-  name: string;
-  value: number;
+interface Section {
+  // id: string;
+  title: string;
+  content: any;
 }
 
-export default function SortableTable() {
-  // Our data
-  const [items, setItems] = useState<RowData[]>([
-    { id: 1, name: "Item One", value: 10 },
-    { id: 2, name: "Item Two", value: 20 },
-    { id: 3, name: "Item Three", value: 30 },
-    { id: 4, name: "Item Four", value: 40 },
-    { id: 5, name: "Item Five", value: 50 },
-  ]);
+interface DraggableSectionProps {
+  section: Section;
+  index: number;
+  moveSection: (dragIndex: number, hoverIndex: number) => void;
+  cardVariants: any;
+  headerRight: () => React.ReactNode;
+  collapsibleContent: React.JSX.Element;
+}
 
-  // We store each item's current (x,y) in parallel to items.
-  // By default, y = index * rowHeight.
-  const rowHeight = 60; // px
-  const [positions, setPositions] = useState(
-    items.map((_, index) => ({ x: 0, y: index * rowHeight }))
-  );
+function DraggableSection({
+  section,
+  index,
+  moveSection,
+  cardVariants,
+  headerRight,
+  collapsibleContent,
+}: DraggableSectionProps) {
+  const ref = useRef(null);
 
-  // Track which item is currently being dragged, for z-index.
-  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: SECTION_TYPE,
+    item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
 
-  // Recompute positions while dragging.
-  const handleDrag = (index: number, e: DraggableEvent, data: DraggableData) => {
-    setPositions((prev) => {
-      const copy = [...prev];
-      copy[index] = { x: 0, y: data.y }; // Only vertical moves
-      return copy;
-    });
-  };
+  const [, drop] = useDrop(() => ({
+    accept: SECTION_TYPE,
+    hover: (dragItem: { index: number }) => {
+      if (!ref.current) return;
+      const dragIndex = dragItem.index;
+      const hoverIndex = index;
+      if (dragIndex === hoverIndex) return;
+      moveSection(dragIndex, hoverIndex);
+      dragItem.index = hoverIndex; // mutate the item’s index
+    },
+  }));
 
-  // On drag start, set which item is on top.
-  const handleStart = (index: number) => {
-    setDraggingIndex(index);
-  };
-
-  // On release, reorder items + positions.
-  const handleStop = (index: number, e: DraggableEvent, data: DraggableData) => {
-    // data.y is final offset.
-    const newIndex = Math.round(data.y / rowHeight);
-    const clampedIndex = Math.max(0, Math.min(newIndex, items.length - 1));
-
-    // If it didn't actually move to a new spot, snap back.
-    if (clampedIndex === index) {
-      setPositions((prev) => {
-        const copy = [...prev];
-        copy[index] = { x: 0, y: index * rowHeight };
-        return copy;
-      });
-      setDraggingIndex(null);
-      return;
-    }
-
-    // Reorder the items array.
-    const updatedItems = [...items];
-    const [movedItem] = updatedItems.splice(index, 1);
-    updatedItems.splice(clampedIndex, 0, movedItem);
-
-    // Reorder positions so each item i is at y = i * rowHeight.
-    const updatedPositions = updatedItems.map((_, i) => ({ x: 0, y: i * rowHeight }));
-
-    setItems(updatedItems);
-    setPositions(updatedPositions);
-    setDraggingIndex(null);
-  };
+  drag(drop(ref));
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-      <Card className="w-full max-w-2xl shadow-md rounded-2xl p-4">
-        <CardContent>
-          <div
-            className="relative"
-            style={{ height: items.length * rowHeight, position: "relative" }}
-          >
-            {items.map((item, index) => {
-              // We feed Draggable a controlled position.
-              const pos = positions[index];
-
-              // If currently dragging this item, set zIndex higher.
-              const isDragging = draggingIndex === index;
-
-              return (
-                <Draggable
-                  key={item.id}
-                  axis="y"
-                  position={{ x: pos.x, y: pos.y }}
-                  onStart={() => handleStart(index)}
-                  onDrag={(e, data) => handleDrag(index, e, data)}
-                  onStop={(e, data) => handleStop(index, e, data)}
-                >
-                  <div
-                    className={
-                      "absolute w-full px-3 py-2 mb-2 border border-gray-200 bg-white " +
-                      "rounded-xl shadow-sm flex items-center transition-transform duration-300"
-                    }
-                    style={{
-                      width: "100%",
-                      height: rowHeight - 8, // small gap
-                      cursor: "move",
-                      zIndex: isDragging ? 999 : 1,
-                    }}
-                  >
-                    <div className="font-semibold w-12">{item.id}</div>
-                    <div className="flex-1">{item.name}</div>
-                    <div className="font-bold">{item.value}</div>
-                  </div>
-                </Draggable>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <motion.div
+      ref={ref}
+      className="p-2"
+      initial="hidden"
+      variants={cardVariants}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.8, delay: (index + 0.5) * 0.2 }}
+      viewport={{ once: true }}
+      style={{ opacity: isDragging ? 0.5 : 1, cursor: "move" }}
+    >
+      <CustomCollapsible
+        key={index}
+        headerText={section.title}
+        headerRight={headerRight()}
+        collapsibleContent={collapsibleContent}
+        defaultOpen={index === 0}
+        isDraggable={true}
+      />
+    </motion.div>
   );
 }
+
+export default DraggableSection;

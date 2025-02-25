@@ -4,16 +4,18 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-
+import { DragHandleDots1Icon, DragHandleDots2Icon, DragHandleVerticalIcon } from '@radix-ui/react-icons';
 
 interface CustomCollapsibleProps {
     headerText: string;
     headerRight: React.ReactNode;
     collapsibleContent: React.JSX.Element;
+    defaultOpen?: boolean;
+    isDraggable?: boolean;
 }
 
-export default function CustomCollapsible({ headerText, headerRight, collapsibleContent }: CustomCollapsibleProps) {
-    const [isOpen, setIsOpen] = useState(false);
+export default function CustomCollapsible({ headerText, headerRight, collapsibleContent, defaultOpen, isDraggable }: CustomCollapsibleProps) {
+    const [isOpen, setIsOpen] = useState(defaultOpen || false);
 
     const toggle = () => {
         setIsOpen((prev) => !prev);
@@ -26,7 +28,11 @@ export default function CustomCollapsible({ headerText, headerRight, collapsible
                 onClick={toggle}
                 className="flex items-center justify-between w-full px-4 py-3 focus:outline-none bg-white rounded-md"
             >
-                <span className="font-semibold text-lg">{headerText}</span>
+                <div className='flex items-center gap-3'>
+                    {isDraggable && <DragHandleDots2Icon />}
+                    <span className="font-semibold text-lg">{headerText}</span>
+
+                </div>
                 <div className='flex items-center gap-3'>
                     {headerRight}
                     <motion.span

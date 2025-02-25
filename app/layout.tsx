@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from 'next/font/local';
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
+import HeaderNav from "@/components/HeaderNav";
 
 
 const testMetricFont = localFont({
@@ -32,6 +33,7 @@ export default function RootLayout({
         className={`${testMetricFont.className} ${testMetricFont.className} antialiased`}
       >
         <ThemeProvider>
+        <HeaderNav />
           {children}
         </ThemeProvider>
       </body>
