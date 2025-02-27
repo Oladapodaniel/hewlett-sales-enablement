@@ -8,14 +8,17 @@ const SECTION_TYPE = "SECTION";
 interface Section {
   // id: string;
   title: string;
-  content: any;
+  content: React.ReactNode;
 }
 
 interface DraggableSectionProps {
   section: Section;
   index: number;
   moveSection: (dragIndex: number, hoverIndex: number) => void;
-  cardVariants: any;
+  cardVariants: {
+    hidden: { opacity: number; x: number };
+    visible: { opacity: number; x: number };
+  };
   headerRight: () => React.ReactNode;
   collapsibleContent: React.JSX.Element;
 }

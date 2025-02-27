@@ -1,7 +1,7 @@
 "use client";
 
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import SlideDeck from '@/components/themes/HPE_Design/SlideDeck';
 import { thumbnail_fifth, thumbnail_first, thumbnail_fourth, thumbnail_second, thumbnail_third } from '@/lib/images';

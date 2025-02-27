@@ -10,7 +10,7 @@ import ImageWithCaption from "./ImageWithCaption";
 import ClosingSide from "./ClosingSlide";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { AlignLeft, ChevronDown, CircleMinus, CirclePlus, Delete, Download, Play, SparklesIcon, Trash2 } from "lucide-react";
+import { AlignLeft, ChevronDown, CircleMinus, CirclePlus, Download, Play, SparklesIcon } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,

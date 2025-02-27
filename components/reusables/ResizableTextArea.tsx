@@ -36,7 +36,7 @@ const ResizableTextArea: React.FC<ResizableTextAreaProps> = ({ value, onChange, 
         if (setTextAreaRef && textareaRef.current) {
             setTextAreaRef(textareaRef.current);
         }
-    }, [value])
+    }, [value, setTextAreaRef])
 
     return (
         <Textarea

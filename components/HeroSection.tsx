@@ -14,10 +14,8 @@ import { Badge } from './ui/badge'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { motion } from 'framer-motion'
 import { Separator } from "@/components/ui/separator"
-import { themes, ThemesInterface } from '@/constants/placeholder'
 import { ClipboardPaste, ImportIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation';
-import { useTheme } from '@/context/ThemeContext'
 import DragAndDropUpload from './reusables/DragAndDropFileUpload'
 import {
     Dialog,
@@ -38,7 +36,7 @@ const HeroSection = () => {
     const router = useRouter();
     const [value, setValue] = useState<string>('');
     const textAreaRef = useRef<HTMLTextAreaElement>(null)
-    const [manualFocus, setManualfocus] = useState<any>(null)
+    const [manualFocus, setManualfocus] = useState<HTMLTextAreaElement | null>(null)
 
 
 
@@ -47,11 +45,6 @@ const HeroSection = () => {
     }, [manualFocus])
 
 
-
-
-
-    const themeContext = useTheme();
-    const { setSelectedTheme } = themeContext;
     const examplePrompts = [
         'Driving Consistent experiences across your hybrid cloud',
         'Deployment Automation Solution',
@@ -60,7 +53,7 @@ const HeroSection = () => {
     ]
 
     // const [isThemeDisplayed, setIsThemeDisplayed] = useState<boolean>(false)
-    const [allThemes, setallThemes] = useState<ThemesInterface[]>([])
+    // const [allThemes, setallThemes] = useState<ThemesInterface[]>([])
     // const [isCustomerDataDisplayed, setIsCustomerDataDisplayed] = useState<boolean>(false)
 
     const audience = [
@@ -84,10 +77,6 @@ const HeroSection = () => {
 
     //     setSelectedTheme(allThemes[index])
     // }
-
-    useEffect(() => {
-        setallThemes(themes)
-    }, [themes])
 
     return (
         <section className="bg-[url('../assets/img/banner_bg.svg')] bg-no-repeat bg-center bg-top bg-cover flex flex-col items-center py-[62px] h-screen">
