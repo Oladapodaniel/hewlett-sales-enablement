@@ -120,13 +120,7 @@ const GenerateProposalPage: React.FC = () => {
         title: string;
         content: string[];
     }
-
-    interface Theme {
-        name: string;
-        description: string;
-        selected: string;
-    }
-
+    
     function reorder(list: Section[], startIndex: number, endIndex: number): Section[] {
         const result = [...list];
         const [removed] = result.splice(startIndex, 1);
