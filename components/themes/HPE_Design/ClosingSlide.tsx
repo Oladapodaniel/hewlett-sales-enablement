@@ -15,29 +15,6 @@ interface ClosingSideProps {
 const ClosingSide: React.FC<ClosingSideProps> = ({ mode, content }) => {
     const { selectedTheme, setSelectedTheme } = useTheme();
 
-
-    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newLogoText = event.target.value;
-        if (selectedTheme === null) return;
-        setSelectedTheme((prevTheme) => {
-            if (prevTheme === null) return null;
-            return {
-                ...prevTheme,
-                slides: prevTheme.slides.map((slide, index) =>
-                    index === 0 ? { ...slide, header: { ...slide.header, text: newLogoText } } : slide
-                )
-                // slides: [
-                //     ...prevTheme.slides,
-                //     {
-                //         ...prevTheme.slides[0],
-                //         logo: newLogoText,
-                //     },
-                // ],
-            };
-        });
-    };
-
-
     const handleTitle = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newTitleText = event.target.value;
         if (selectedTheme === null) return;
@@ -86,30 +63,6 @@ const ClosingSide: React.FC<ClosingSideProps> = ({ mode, content }) => {
         });
     };
 
-
-    const handleFooter = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newFooterText = event.target.value;
-        if (selectedTheme === null) return;
-
-        setSelectedTheme((prevTheme) => {
-            if (prevTheme === null) return null;
-            return {
-                ...prevTheme,
-                slides: prevTheme.slides.map((slide, index) =>
-                    index === 0 ? { ...slide, header: { ...slide.header, text: newFooterText } } : slide
-                )
-                // slides: [
-                //     {
-                //         ...prevTheme.slides[0],
-                //         footer: {
-                //             ...prevTheme.slides[0].footer,
-                //             text: newFooterText,
-                //         },
-                //     },
-                // ],
-            };
-        })
-    };
 
 
     return (

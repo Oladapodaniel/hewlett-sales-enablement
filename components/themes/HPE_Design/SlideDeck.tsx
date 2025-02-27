@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Image, { StaticImageData } from "next/image";
-import { purple_theme_thumbnail, purple_theme_thumbnail_2, thumbnail_fifth, thumbnail_first, thumbnail_fourth, thumbnail_second, thumbnail_third } from "@/lib/images";
 import { SectionProps } from "@/app/slide-deck/page"
 import TitlePage from "./TitlePage";
 import SectionHeader from "./SectionHeader";
@@ -11,7 +10,7 @@ import ImageWithCaption from "./ImageWithCaption";
 import ClosingSide from "./ClosingSlide";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { AlignLeft, ArrowRightIcon, ChevronDown, CircleMinus, CirclePlus, Delete, Download, Play, SparklesIcon, Trash2 } from "lucide-react";
+import { AlignLeft, ChevronDown, CircleMinus, CirclePlus, Delete, Download, Play, SparklesIcon, Trash2 } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,

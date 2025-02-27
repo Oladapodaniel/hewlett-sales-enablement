@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import { DragHandleDots1Icon, DragHandleDots2Icon, DragHandleVerticalIcon } from '@radix-ui/react-icons';
+import { DragHandleDots2Icon } from '@radix-ui/react-icons';
 
 interface CustomCollapsibleProps {
     headerText: string;

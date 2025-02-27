@@ -55,7 +55,7 @@ export default function DragAndDropUpload() {
                 onClick={handleClick}
             >
                 <UploadCloudIcon size={'40'} className='text-gray-500' />
-                <p className="text-gray-500 mb-2 mt-3 text-center text-xl">Drag 'n' drop files here, or click to select files</p>
+                <p className="text-gray-500 mb-2 mt-3 text-center text-xl">Drag and drop files here, or click to select files</p>
                 <input
                     ref={fileInputRef}
                     id="fileInput"

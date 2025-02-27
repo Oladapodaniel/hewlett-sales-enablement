@@ -18,7 +18,7 @@ const Page: React.FC = () => {
     const { selectedTheme } = useTheme();
 
     
-    const [sections, setSections] = useState<SectionProps[]>([
+    const sections: SectionProps[] = ([
             {
                 title: "SUSTAINABLE DATA CENTERS",
                 id: 1,

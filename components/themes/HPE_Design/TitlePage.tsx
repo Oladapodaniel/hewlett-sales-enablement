@@ -3,7 +3,7 @@
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { green_band, logo, logo_2 } from '@/lib/images';
+import { green_band, logo_2 } from '@/lib/images';
 import Image from 'next/image';
 import { SectionProps } from '@/app/slide-deck/page';
 
@@ -14,28 +14,6 @@ interface TitlePageProps {
 
 const TitlePage: React.FC<TitlePageProps> = ({ mode, content }) => {
     const { selectedTheme, setSelectedTheme } = useTheme();
-
-
-    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newLogoText = event.target.value;
-        if (selectedTheme === null) return;
-        setSelectedTheme((prevTheme) => {
-            if (prevTheme === null) return null;
-            return {
-                ...prevTheme,
-                slides: prevTheme.slides.map((slide, index) =>
-                    index === 0 ? { ...slide, header: { ...slide.header, text: newLogoText } } : slide
-                )
-                // slides: [
-                //     ...prevTheme.slides,
-                //     {
-                //         ...prevTheme.slides[0],
-                //         logo: newLogoText,
-                //     },
-                // ],
-            };
-        });
-    };
 
 
     const handleTitle = (event: React.ChangeEvent<HTMLTextAreaElement>) => {

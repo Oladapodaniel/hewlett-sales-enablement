@@ -1,11 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-interface ElipsisProps {
-    // Define your props here
-}
 
-const Elipsis: React.FC<ElipsisProps> = (props) => {
+const Elipsis: React.FC = () => {
     return (
             <motion.span
                 initial={{ opacity: 1 }}

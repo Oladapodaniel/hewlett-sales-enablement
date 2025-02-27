@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect } from 'react';
 import { Textarea } from '../ui/textarea';
 
 interface ResizableTextAreaProps {
@@ -15,8 +15,6 @@ const ResizableTextArea: React.FC<ResizableTextAreaProps> = ({ value, onChange, 
 
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         onChange(e.target.value);
-
-
 
         // Make sure the textarea ref exists and then reset / recalc the height
         if (textareaRef.current) {

@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import React, { useEffect, useState, ChangeEvent, useRef, useCallback } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -12,10 +12,10 @@ import {
 import { PaperPlaneIcon } from '@radix-ui/react-icons'
 import { Badge } from './ui/badge'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Separator } from "@/components/ui/separator"
 import { themes, ThemesInterface } from '@/constants/placeholder'
-import { ArrowLeft, ArrowRight, ClipboardPaste, ImportIcon } from 'lucide-react'
+import { ClipboardPaste, ImportIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext'
 import DragAndDropUpload from './reusables/DragAndDropFileUpload'
@@ -59,9 +59,9 @@ const HeroSection = () => {
         // 'Create a slide deck for a sales proposal to Microsoft',
     ]
 
-    const [isThemeDisplayed, setIsThemeDisplayed] = useState<boolean>(false)
+    // const [isThemeDisplayed, setIsThemeDisplayed] = useState<boolean>(false)
     const [allThemes, setallThemes] = useState<ThemesInterface[]>([])
-    const [isCustomerDataDisplayed, setIsCustomerDataDisplayed] = useState<boolean>(false)
+    // const [isCustomerDataDisplayed, setIsCustomerDataDisplayed] = useState<boolean>(false)
 
     const audience = [
         'Large Enterprises',
@@ -74,16 +74,16 @@ const HeroSection = () => {
         'Channel Partners'
     ]
 
-    const chooseSelectedTheme = (index: number) => {
-        setallThemes(prevThemes =>
-            prevThemes.map((theme, i) => ({
-                ...theme,
-                selected: i === index
-            }))
-        );
+    // const chooseSelectedTheme = (index: number) => {
+    //     setallThemes(prevThemes =>
+    //         prevThemes.map((theme, i) => ({
+    //             ...theme,
+    //             selected: i === index
+    //         }))
+    //     );
 
-        setSelectedTheme(allThemes[index])
-    }
+    //     setSelectedTheme(allThemes[index])
+    // }
 
     useEffect(() => {
         setallThemes(themes)
@@ -216,7 +216,7 @@ const HeroSection = () => {
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    {audience.map((i, index) => (<SelectItem className='text-lg font-[300]' value={index.toString()}>{i}</SelectItem>))}
+                                                    {audience.map((i, index) => (<SelectItem key={index} className='text-lg font-[300]' value={index.toString()}>{i}</SelectItem>))}
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
@@ -255,7 +255,7 @@ const HeroSection = () => {
                                         <DialogHeader>
                                             <DialogTitle className='text-2xl leading-tight'>Paste in text</DialogTitle>
                                             <DialogDescription className='text-lg font-[300] leading-[0.5]'>
-                                                Add the notes, outlines, or contents you'd like us to use.
+                                                Add the notes, outlines, or contents you would like us to use.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className='mt-5 w-full h-full'>
@@ -272,7 +272,7 @@ const HeroSection = () => {
                                     <SelectContent>
                                         <SelectGroup>
                                             <SelectItem value="apple">Andrew Beck - Anheuser-Busch Companies​</SelectItem>
-                                            <SelectItem value="banana">Sam Meyr - Ford Motor Company​</SelectItem>
+                                            <SelectItem value="banana">Sam Meyr - Ford Motor Company</SelectItem>
                                             <SelectItem value="blueberry">Dlynne Schade - Mc Donalds Inc.​</SelectItem>
                                         </SelectGroup>
                                     </SelectContent>

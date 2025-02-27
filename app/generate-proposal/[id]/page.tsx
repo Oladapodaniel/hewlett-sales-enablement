@@ -1,19 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Skeleton } from "@/components/ui/skeleton"
 import { motion } from "framer-motion";
 import Spinner from '@/components/reusables/Spinner';
 import Elipsis from '@/components/reusables/Elipsis';
-import DragAndDropCards from '@/components/reusables/DragAndDropCards';
-import CollapsibleElement from '@/components/reusables/Collapsible';
 import { ArrowRightIcon, CopyIcon, FileIcon, SquareDashedMousePointer, TrashIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
