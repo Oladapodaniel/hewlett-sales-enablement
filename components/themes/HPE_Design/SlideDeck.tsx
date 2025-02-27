@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import Image, { StaticImageData } from "next/image";
 import { purple_theme_thumbnail, purple_theme_thumbnail_2, thumbnail_fifth, thumbnail_first, thumbnail_fourth, thumbnail_second, thumbnail_third } from "@/lib/images";
 import { SectionProps } from "@/app/slide-deck/page"
 import TitlePage from "./TitlePage";
@@ -9,7 +11,7 @@ import ImageWithCaption from "./ImageWithCaption";
 import ClosingSide from "./ClosingSlide";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { AlignLeft, ArrowRightIcon, ChevronDown, SparklesIcon } from "lucide-react";
+import { AlignLeft, ArrowRightIcon, ChevronDown, CircleMinus, CirclePlus, Delete, Download, Play, SparklesIcon, Trash2 } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -19,6 +21,16 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input";
+import { useDrag, useDrop } from 'react-dnd';
+import { motion } from 'framer-motion';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { DragHandleDots2Icon } from "@radix-ui/react-icons";
+import { useTheme } from "@/context/ThemeContext";
 
 
 interface SlideDeckProps {
@@ -28,6 +40,8 @@ interface SlideDeckProps {
 
 const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     const router = useRouter();
+    const [slidesState, setSlides] = useState(slides);
+    const { slideStates, setSlideState } = useTheme()
     const [titleOpen, setTitleOpen] = useState<boolean>(false);
     const [sectionHeaderOpen, setsectionHeaderOpen] = useState<boolean>(false);
     const [bulletListOpen, setbulletListOpen] = useState<boolean>(false);
@@ -45,29 +59,61 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
         { text: "Add a smart summary" },
     ]
 
+
+    const moveSlide = (fromIndex: number, toIndex: number) => {
+        const updatedSlides = [...slidesState];
+        const [movedSlide] = updatedSlides.splice(fromIndex, 1);
+        updatedSlides.splice(toIndex, 0, movedSlide);
+        setSlides(updatedSlides);
+        setSlideState(slidesState)
+    };
+
+    const duplicateSlide = (index: number) => {
+        const newSlides = [...slidesState];
+        const slideToDuplicate = newSlides[index];
+        newSlides.splice(index + 1, 0, { ...slideToDuplicate });
+        setSlides(newSlides);
+    }
+    const removeSlide = (index: number) => {
+        const updatedSlides = slidesState.filter((_, i) => i !== index);
+        setSlides(updatedSlides);
+    };
+
+
     return (
-        <>
-            <div className="flex justify-end p-4">
-                <Button onClick={() => router.push("/present")} className="rounded-full text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">Present
-                    <ArrowRightIcon className="w-6 h-5" />
+
+        <DndProvider backend={HTML5Backend}>
+            <div className="flex gap-4 justify-end p-4">
+                <Button onClick={() => router.push("/present")} variant={'secondary'} className="rounded-full text-lg bg-secondary text-black shadow-lg" type="submit">
+                    <Download /> Download
+                </Button>
+                <Button onClick={() => router.push("/present")} className="rounded-full text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">
+                    <Play /> Present
                 </Button>
             </div>
+
             <div className="grid grid-cols-5 gap-6">
                 <div className="col-span-1">
-                    <div className="fixed w-[155px] shadow-[0_16px_36px_#542fb814] max-h-[700px] overflow-scroll mt-[70px] bg-white p-2">
+                    <div className="fixed w-[170px] shadow-[0_16px_36px_#542fb814] border rounded-md max-h-[700px] overflow-scroll bg-white p-2">
                         <div className="flex flex-col gap-4">
-                            <Image src={thumbnail_first} alt="logo" width={155} height={155} className="rounded-md" />
-                            <Image src={thumbnail_second} alt="logo" width={155} height={155} className="rounded-md" />
-                            <Image src={thumbnail_third} alt="logo" width={155} height={155} className="rounded-md" />
-                            <Image src={thumbnail_fourth} alt="logo" width={155} height={155} className="rounded-md" />
-                            <Image src={thumbnail_fifth} alt="logo" width={155} height={155} className="rounded-md" />
+                            {(slideStates.length > 0 ? slideStates : slidesState).map((slide, index) => (
+                                <SlideThumbnail
+                                    key={index}
+                                    index={index}
+                                    src={slide.thumbnail}
+                                    alt={`Slide ${index + 1}`}
+                                    moveSlide={moveSlide}
+                                    duplicateSlide={() => duplicateSlide(index)}
+                                    removeSlide={() => removeSlide(index)}
+                                />
+                            ))}
                         </div>
+
                     </div>
                 </div>
-                {/* <div className="w-[400px] h-[700px] mt-[70px]"></div> */}
                 <div className="col-span-3 flex flex-col gap-10">
                     {
-                        slides.map((slide, index) => (
+                        (slideStates.length > 0 ? slideStates : slidesState).map((slide, index) => (
                             <div key={index}>
                                 {slide.templateSlide === 'TitleSlide' ? (
                                     <div className="relative group" >
@@ -211,11 +257,103 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                         )
                     }
                 </div>
-                <div className="col-span-1">
+            </div>
+            <div className="col-span-1">
+            </div>
+        </DndProvider>
 
+    );
+}
+
+const ItemType = {
+    SLIDE: 'slide',
+};
+
+interface SlideThumbnailProps {
+    src: StaticImageData;
+    alt: string;
+    index: number;
+    moveSlide: (fromIndex: number, toIndex: number) => void;
+    duplicateSlide?: () => void;
+    removeSlide?: () => void;
+}
+
+const SlideThumbnail: React.FC<SlideThumbnailProps> = ({ src, alt, index, moveSlide, duplicateSlide, removeSlide }) => {
+    const [, ref] = useDrag({
+        type: ItemType.SLIDE,
+        item: { index },
+    });
+
+    const node = useRef<HTMLDivElement>(null);
+
+    const [, drop] = useDrop({
+        accept: ItemType.SLIDE,
+        hover: (draggedItem: { index: number }) => {
+            if (draggedItem.index !== index) {
+                moveSlide(draggedItem.index, index);
+                draggedItem.index = index;
+            }
+        },
+    });
+
+    const [isDragging, setIsDragging] = useState(false);
+
+    const handleDragStart = () => {
+        setIsDragging(true);
+    };
+
+    const handleDragEnd = () => {
+        setIsDragging(false);
+    };
+
+    ref(drop(node));
+
+    return (
+        <motion.div
+            ref={node}
+            style={{
+                opacity: isDragging ? 0.5 : 1,
+            }}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+
+            layout
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            className="cursor-pointer"
+        >
+            <div className="relative group">
+                <div className="absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger onClick={duplicateSlide}>
+                                    <CirclePlus className="text-primary w-4 mr-1" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Duplicate this slide</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </span>
+                    <span>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger onClick={removeSlide}>
+                                    <CircleMinus className="text-red-700 w-4" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Remove this slide</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </span>
+                </div>
+                <div className="flex">
+                    <DragHandleDots2Icon className="w-[20px]" />
+                    <Image src={src} alt={alt} width={135} height={135} className="rounded-md border-2" />
                 </div>
             </div>
-        </>
+        </motion.div>
     );
 }
 

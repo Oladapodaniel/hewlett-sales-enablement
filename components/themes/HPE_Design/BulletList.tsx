@@ -154,7 +154,7 @@ const BulletList: React.FC<BulletListProps> = ({ mode, content }) => {
                     )}
 
                 </div>
-                <Image src={box_green_band} alt='logo' className='mt-5 w-[50px] absolute bottom-0' />
+                <Image src={box_green_band} alt='logo' className='mt-5 w-[50px] absolute -bottom-5' />
             </div>
         </div>
     );

@@ -151,7 +151,7 @@ const ImageWithCaption: React.FC<ImageWithCaptionProps> = ({ mode, content }) =>
 
                 </div>
                 <div className='px-12'>
-                    <Image src={box_green_band} alt='logo' className='mt-5 w-[50px] absolute bottom-0' />
+                    <Image src={box_green_band} alt='logo' className='mt-5 w-[50px] absolute -bottom-5' />
                 </div>
             </div>
         </div>

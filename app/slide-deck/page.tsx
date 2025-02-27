@@ -4,12 +4,15 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import SlideDeck from '@/components/themes/HPE_Design/SlideDeck';
+import { thumbnail_fifth, thumbnail_first, thumbnail_fourth, thumbnail_second, thumbnail_third } from '@/lib/images';
+import { StaticImageData } from 'next/image';
 
 export interface SectionProps {
     title: string;
     id: number;
     templateSlide: string;
     content: string[];
+    thumbnail: StaticImageData
 }
 const Page: React.FC = () => {
     const { selectedTheme } = useTheme();
@@ -23,7 +26,8 @@ const Page: React.FC = () => {
                 content: [
                     'Joe Glenski',
                     'May 20, 2021'
-                ]
+                ],
+                thumbnail: thumbnail_first
             },
             {
                 title: "Introduction",
@@ -31,7 +35,8 @@ const Page: React.FC = () => {
                 templateSlide: "SectionHeader",
                 content: [
                     'A brief overview of spoke systems architecture.',
-                ]
+                ],
+                thumbnail: thumbnail_second
             },
             {
                 title: "Key benefits of Sustainable Data Centers",
@@ -42,7 +47,8 @@ const Page: React.FC = () => {
                     'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
                     'Compliance: Aligns with global sustainability goals and regulations.',
                     'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
-                ]
+                ],
+                thumbnail: thumbnail_third
             },
             {
                 title: "Energy Efficiency Technologies",
@@ -51,7 +57,8 @@ const Page: React.FC = () => {
                 content: [
                     'Free Cooling: Utilizes outside air to cool data centers, reducing reliance on traditional cooling systems.',
                     // 'Virtualization: Increases server utilization rates, decreasing the number of physical servers needed.'
-                ]
+                ],
+                thumbnail: thumbnail_fourth
             },
             {
                 title: "Thank You",
@@ -59,7 +66,8 @@ const Page: React.FC = () => {
                 templateSlide: "ClosingSlide",
                 content: [
                     'glenski@hpe.com',
-                ]
+                ],
+                thumbnail: thumbnail_fifth
             }
         ])
 

@@ -10,9 +10,12 @@ import EndPageProps from '@/components/themes/purple_theme/EndPage';
 import StartPage from '@/components/themes/purple_theme/StartPage';
 import React, { useState } from 'react';
 import { SectionProps } from '../slide-deck/page';
+import { thumbnail_fifth, thumbnail_first, thumbnail_fourth, thumbnail_second, thumbnail_third } from '@/lib/images';
+import { useTheme } from '@/context/ThemeContext';
 
 const Page: React.FC = () => {
     const [currentSlide, setCurrentSlide] = React.useState(1);
+    const { slideStates } = useTheme();
     const purple_theme = {
         slides: [
             {
@@ -117,7 +120,8 @@ const Page: React.FC = () => {
             content: [
                 'Joe Glenski',
                 'May 20, 2021'
-            ]
+            ],
+            thumbnail: thumbnail_first
         },
         {
             title: "Introduction",
@@ -125,7 +129,8 @@ const Page: React.FC = () => {
             templateSlide: "SectionHeader",
             content: [
                 'A brief overview of spoke systems architecture.',
-            ]
+            ],
+            thumbnail: thumbnail_second
         },
         {
             title: "Key benefits of Sustainable Data Centers",
@@ -136,7 +141,8 @@ const Page: React.FC = () => {
                 'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
                 'Compliance: Aligns with global sustainability goals and regulations.',
                 'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
-            ]
+            ],
+            thumbnail: thumbnail_third
         },
         {
             title: "Energy Efficiency Technologies",
@@ -145,7 +151,8 @@ const Page: React.FC = () => {
             content: [
                 'Free Cooling: Utilizes outside air to cool data centers, reducing reliance on traditional cooling systems.',
                 // 'Virtualization: Increases server utilization rates, decreasing the number of physical servers needed.'
-            ]
+            ],
+            thumbnail: thumbnail_fourth
         },
         {
             title: "Thank You",
@@ -153,14 +160,15 @@ const Page: React.FC = () => {
             templateSlide: "ClosingSlide",
             content: [
                 'glenski@hpe.com',
-            ]
+            ],
+            thumbnail: thumbnail_fifth
         }
     ])
 
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            console.log(sections.length - 1)
-            if ((event.key === 'ArrowRight' || event.key === 'ArrowDown') && currentSlide > 0 && currentSlide < sections.length) {
+            console.log(slideStates.length - 1)
+            if ((event.key === 'ArrowRight' || event.key === 'ArrowDown') && currentSlide > 0 && currentSlide < slideStates.length) {
                 setCurrentSlide((prev) => prev + 1);
             }
         };
@@ -177,18 +185,18 @@ const Page: React.FC = () => {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [currentSlide, sections.length]);
+    }, [currentSlide, slideStates.length]);
 
     return (
         <div>
             {
-                sections.map((section, index) => (
+                slideStates.map((section, index) => (
                     <div key={index}>
-                        {currentSlide === section.id && section.templateSlide === "TitleSlide" && <TitlePage mode='presenting' content={section} />}
-                        {currentSlide === section.id && section.templateSlide === "SectionHeader" && <SectionHeader mode='presenting' content={section} />}
-                        {currentSlide === section.id && section.templateSlide === "BulletList" && <BulletList mode='presenting' content={section} />}
-                        {currentSlide === section.id && section.templateSlide === "ImageWithCaption" && <ImageWithCaption mode='presenting' content={section} />}
-                        {currentSlide === section.id && section.templateSlide === "ClosingSlide" && <ClosingSide mode='presenting' content={section} />}
+                        {currentSlide === index + 1 && section.templateSlide === "TitleSlide" && <TitlePage mode='presenting' content={section} />}
+                        {currentSlide === index + 1 && section.templateSlide === "SectionHeader" && <SectionHeader mode='presenting' content={section} />}
+                        {currentSlide === index + 1 && section.templateSlide === "BulletList" && <BulletList mode='presenting' content={section} />}
+                        {currentSlide === index + 1 && section.templateSlide === "ImageWithCaption" && <ImageWithCaption mode='presenting' content={section} />}
+                        {currentSlide === index + 1 && section.templateSlide === "ClosingSlide" && <ClosingSide mode='presenting' content={section} />}
                     </div>
                 ))
             }
