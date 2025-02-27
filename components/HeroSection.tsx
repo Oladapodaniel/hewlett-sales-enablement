@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import React, { useEffect, useState, ChangeEvent } from 'react'
+import React, { useEffect, useState, ChangeEvent, useRef, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -37,20 +37,42 @@ import ResizableTextArea from './reusables/ResizableTextArea'
 const HeroSection = () => {
     const router = useRouter();
     const [value, setValue] = useState<string>('');
+    const textAreaRef = useRef<HTMLTextAreaElement>(null)
+    const [manualFocus, setManualfocus] = useState<any>(null)
+
+
+
+    useEffect(() => {
+        textAreaRef.current = manualFocus;
+    }, [manualFocus])
+
+
+
 
 
     const themeContext = useTheme();
     const { setSelectedTheme } = themeContext;
     const examplePrompts = [
-        'Key Strategies for Remote Team Collaboration',
-        'Building an Effective Sales Team',
-        'Redefining Office Productivity with AIGC',
-        'Create a slide deck for a sales proposal to Microsoft',
+        'Driving Consistent experiences across your hybrid cloud',
+        'Deployment Automation Solution',
+        // 'Redefining Office Productivity with AIGC',
+        // 'Create a slide deck for a sales proposal to Microsoft',
     ]
 
     const [isThemeDisplayed, setIsThemeDisplayed] = useState<boolean>(false)
     const [allThemes, setallThemes] = useState<ThemesInterface[]>([])
     const [isCustomerDataDisplayed, setIsCustomerDataDisplayed] = useState<boolean>(false)
+
+    const audience = [
+        'Large Enterprises',
+        'SMBs',
+        'Government & Public Sector',
+        'Cloud & MSPs',
+        'Research & HPC',
+        'Industrial & Manufacturing',
+        'Healthcare & Life Sciences',
+        'Channel Partners'
+    ]
 
     const chooseSelectedTheme = (index: number) => {
         setallThemes(prevThemes =>
@@ -109,14 +131,23 @@ const HeroSection = () => {
                                 <div className='relative mb-3'>
                                     <ResizableTextArea
                                         value={value}
+                                        placeholder='Driving Consistent experiences across your hybrid cloud'
                                         onChange={(value: string) => setValue(value)}
+                                        setTextAreaRef={(value) => {
+                                            setManualfocus(value)
+                                        }}
+
                                     />
                                     <Button onClick={() => router.push('/refine-request-topic')} className="absolute bottom-1 right-1 rounded-[12px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit"><PaperPlaneIcon /></Button>
                                 </div>
                                 <div>
                                     <div className="space-x-2">
                                         {examplePrompts.map((i, index) => (
-                                            <Badge key={index} className="mt-2 text-primary text-md font-[400] border border-primary bg-white" variant="secondary">{i}</Badge>
+                                            <Badge key={index} onClick={() => {
+                                                setValue(i)
+                                                textAreaRef.current?.focus();
+
+                                            }} className="mt-2 text-primary text-md font-[400] border border-primary bg-white cursor-pointer" variant="secondary">{i}</Badge>
                                         ))}
                                     </div>
                                 </div>
@@ -125,10 +156,10 @@ const HeroSection = () => {
                                 </div>
                                 <div className='flex flex-wrap gap-3'>
                                     <div>
-                                        <div className='text-sm font-medium text-neutral-600 mb-1'>Pages</div>
+                                        <div className='text-sm font-medium text-neutral-600 mb-1'>Slides</div>
                                         <Select>
                                             <SelectTrigger className="w-[160px] bg-secondary border-none rounded-lg">
-                                                <SelectValue placeholder="Pages" />
+                                                <SelectValue placeholder="Slides" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
@@ -185,12 +216,7 @@ const HeroSection = () => {
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    <SelectItem value="apple">General</SelectItem>
-                                                    <SelectItem value="banana">Business</SelectItem>
-                                                    <SelectItem value="blueberry">Investor</SelectItem>
-                                                    <SelectItem value="grapes">Teacher</SelectItem>
-                                                    <SelectItem value="pineapple">Student</SelectItem>
-                                                    <SelectItem value="pineapple">Supervisor</SelectItem>
+                                                    {audience.map((i, index) => (<SelectItem className='text-lg font-[300]' value={index.toString()}>{i}</SelectItem>))}
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>

@@ -50,6 +50,7 @@ const RefineRequestPrompt: React.FC = () => {
                             <ResizableTextArea
                                 value={value}
                                 onChange={handleChange}
+                                placeholder="Enter your response here..."
                             />
                             <Button onClick={() => router.push('/generate-proposal/ks388sqz512g1oc?mode=doc#card-wslygcru2f2yfpb')} className="absolute bottom-1 right-1 w-[40px] h-[40px] rounded-full bg-[#03A983] shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit"><PaperPlaneIcon /></Button>
                         </div>

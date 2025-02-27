@@ -1,18 +1,22 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { Textarea } from '../ui/textarea';
 
 interface ResizableTextAreaProps {
     value: string;
     onChange: (value: string) => void;
     className?: string;
+    placeholder: string;
+    setTextAreaRef?: (ref: HTMLTextAreaElement) => void
 }
 
-const ResizableTextArea: React.FC<ResizableTextAreaProps> = ({ value, onChange, className }) => {
+const ResizableTextArea: React.FC<ResizableTextAreaProps> = ({ value, onChange, className, placeholder, setTextAreaRef }) => {
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
     const MAX_HEIGHT = 200; // in px
 
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         onChange(e.target.value);
+
+
 
         // Make sure the textarea ref exists and then reset / recalc the height
         if (textareaRef.current) {
@@ -30,15 +34,21 @@ const ResizableTextArea: React.FC<ResizableTextAreaProps> = ({ value, onChange, 
         }
     };
 
+    useEffect(() => {
+        if (setTextAreaRef && textareaRef.current) {
+            setTextAreaRef(textareaRef.current);
+        }
+    }, [value])
+
     return (
         <Textarea
             className={`rounded-[15px] border-2 border-[rgb(204_204_204)] ${className}`}
-            placeholder="Key Strategies for Remote Team Collaboration"
+            placeholder={placeholder}
             rows={1}
             onChange={handleChange}
             ref={textareaRef}
             value={value}
-            
+
         />
     );
 };

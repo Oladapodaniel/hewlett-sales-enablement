@@ -20,7 +20,7 @@ const Page: React.FC = () => {
     
     const [sections, setSections] = useState<SectionProps[]>([
             {
-                title: "SPOCK SYSTEMS ARCHITECTURE",
+                title: "SUSTAINABLE DATA CENTERS",
                 id: 1,
                 templateSlide: "TitleSlide",
                 content: [
