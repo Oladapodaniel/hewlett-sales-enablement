@@ -116,13 +116,29 @@ const GenerateProposalPage: React.FC = () => {
             selected: "6"
         },
     ]
+    interface Section {
+        title: string;
+        content: string[];
+    }
 
-    function reorder(list: any[], startIndex: number, endIndex: number): any[] {
+    interface Theme {
+        name: string;
+        description: string;
+        selected: string;
+    }
+
+    function reorder(list: Section[], startIndex: number, endIndex: number): Section[] {
         const result = [...list];
         const [removed] = result.splice(startIndex, 1);
         result.splice(endIndex, 0, removed);
         return result;
     }
+    // function reorder(list: any[], startIndex: number, endIndex: number): any[] {
+    //     const result = [...list];
+    //     const [removed] = result.splice(startIndex, 1);
+    //     result.splice(endIndex, 0, removed);
+    //     return result;
+    // }
 
     const moveSection = (dragIndex: number, hoverIndex: number) => {
         setSections((prev) => reorder(prev, dragIndex, hoverIndex));
