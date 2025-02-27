@@ -120,7 +120,7 @@ const GenerateProposalPage: React.FC = () => {
         title: string;
         content: string[];
     }
-    
+
     function reorder(list: Section[], startIndex: number, endIndex: number): Section[] {
         const result = [...list];
         const [removed] = result.splice(startIndex, 1);
@@ -200,7 +200,7 @@ const GenerateProposalPage: React.FC = () => {
                                             >Choose your theme</motion.span>
                                         </div>
                                         <RadioGroup value={selectedTheme} onValueChange={setSelectedTheme}>
-                                            <div className='flex flex-wrap justify-center md:justify-start gap-3'>
+                                            <div className='grid grid-cols-2 gap-3'>
                                                 {contentThemes.map((theme, index) => (
                                                     <motion.div
                                                         key={index}
@@ -209,8 +209,9 @@ const GenerateProposalPage: React.FC = () => {
                                                         whileInView={{ opacity: 1, x: 0 }}
                                                         transition={{ duration: 0.8, delay: (index + .5) * 0.2 }}
                                                         viewport={{ once: true }}
+                                                        className='col-span-2 lg:col-span-1'
                                                     >
-                                                        <Card className={`w-[350px] ${theme.selected === selectedTheme ? "border border-primary" : ""}`}>
+                                                        <Card className={`${theme.selected === selectedTheme ? "border border-primary" : ""}`}>
                                                             <CardHeader>
                                                                 <CardTitle>{theme.name}</CardTitle>
                                                                 <CardDescription>{theme.description}</CardDescription>

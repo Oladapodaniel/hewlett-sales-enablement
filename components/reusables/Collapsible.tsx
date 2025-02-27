@@ -26,7 +26,7 @@ export default function CustomCollapsible({ headerText, headerRight, collapsible
             {/* Header / Trigger */}
             <button
                 onClick={toggle}
-                className="flex items-center justify-between w-full px-4 py-3 focus:outline-none bg-white rounded-md"
+                className="flex flex-col md:flex-row md:items-center justify-between w-full px-4 py-3 focus:outline-none bg-white rounded-md"
             >
                 <div className='flex items-center gap-3'>
                     {isDraggable && <DragHandleDots2Icon />}

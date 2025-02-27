@@ -110,7 +110,7 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
 
                     </div>
                 </div>
-                <div className="col-span-3 flex flex-col gap-10">
+                <div className="col-span-4 flex flex-col gap-10">
                     {
                         (slideStates.length > 0 ? slideStates : slidesState).map((slide, index) => (
                             <div key={index}>
