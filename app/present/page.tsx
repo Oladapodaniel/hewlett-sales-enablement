@@ -1,12 +1,18 @@
 'use client';
 
+import BulletList from '@/components/themes/HPE_Design/BulletList';
+import ClosingSide from '@/components/themes/HPE_Design/ClosingSlide';
+import ImageWithCaption from '@/components/themes/HPE_Design/ImageWithCaption';
+import SectionHeader from '@/components/themes/HPE_Design/SectionHeader';
+import TitlePage from '@/components/themes/HPE_Design/TitlePage';
 import BodyPageOne from '@/components/themes/purple_theme/BodyPageOne';
 import EndPageProps from '@/components/themes/purple_theme/EndPage';
 import StartPage from '@/components/themes/purple_theme/StartPage';
-import React from 'react';
+import React, { useState } from 'react';
+import { SectionProps } from '../slide-deck/page';
 
 const Page: React.FC = () => {
-    const [currentSlide, setCurrentSlide] = React.useState(0);
+    const [currentSlide, setCurrentSlide] = React.useState(1);
     const purple_theme = {
         slides: [
             {
@@ -31,7 +37,7 @@ const Page: React.FC = () => {
                     text: '20XX-XX-XX',
                     fontSize: '4xl'
                 },
-                bg: '../assets/img/start_deck_bg.png',
+                bg: '../assets/img/HPE_theme_assets/start_deck_bg.png',
                 logo: 'YOUR LOGO',
                 logoFontSize: '4xl',
                 logoFontWeight: 'medium',
@@ -103,16 +109,64 @@ const Page: React.FC = () => {
         ]
     }
 
+    const [sections, setSections] = useState<SectionProps[]>([
+        {
+            title: "SPOCK SYSTEMS ARCHITECTURE",
+            id: 1,
+            templateSlide: "TitleSlide",
+            content: [
+                'Joe Glenski',
+                'May 20, 2021'
+            ]
+        },
+        {
+            title: "Introduction",
+            id: 2,
+            templateSlide: "SectionHeader",
+            content: [
+                'A brief overview of spoke systems architecture.',
+            ]
+        },
+        {
+            title: "Key benefits of Sustainable Data Centers",
+            id: 3,
+            templateSlide: "BulletList",
+            content: [
+                'Cost Savings: Reduced energy consumption leads to significant cost reductions.',
+                'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
+                'Compliance: Aligns with global sustainability goals and regulations.',
+                'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
+            ]
+        },
+        {
+            title: "Energy Efficiency Technologies",
+            id: 4,
+            templateSlide: "ImageWithCaption",
+            content: [
+                'Free Cooling: Utilizes outside air to cool data centers, reducing reliance on traditional cooling systems.',
+                // 'Virtualization: Increases server utilization rates, decreasing the number of physical servers needed.'
+            ]
+        },
+        {
+            title: "Thank You",
+            id: 5,
+            templateSlide: "ClosingSlide",
+            content: [
+                'glenski@hpe.com',
+            ]
+        }
+    ])
+
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            console.log(purple_theme.slides.length - 1)
-            if ((event.key === 'ArrowRight' || event.key === 'ArrowDown') && currentSlide >= 0 && currentSlide < purple_theme.slides.length - 1) {
+            console.log(sections.length - 1)
+            if ((event.key === 'ArrowRight' || event.key === 'ArrowDown') && currentSlide > 0 && currentSlide < sections.length) {
                 setCurrentSlide((prev) => prev + 1);
             }
         };
         const handleKeyUp = (event: KeyboardEvent) => {
 
-            if ((event.key === 'ArrowLeft' || event.key === 'ArrowUp') && currentSlide > 0) {
+            if ((event.key === 'ArrowLeft' || event.key === 'ArrowUp') && currentSlide >= 2) {
                 setCurrentSlide((prev) => prev - 1);
             }
         };
@@ -123,14 +177,21 @@ const Page: React.FC = () => {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [currentSlide, purple_theme.slides.length]);
+    }, [currentSlide, sections.length]);
 
     return (
         <div>
-            {currentSlide === 0 && <StartPage mode="presenting" />}
-            {currentSlide === 1 && <BodyPageOne mode="presenting" />}
-            {currentSlide === 2 && <BodyPageOne mode="presenting" />}
-            {currentSlide === 3 && <EndPageProps mode='presenting' />}
+            {
+                sections.map((section, index) => (
+                    <div key={index}>
+                        {currentSlide === section.id && section.templateSlide === "TitleSlide" && <TitlePage mode='presenting' content={section} />}
+                        {currentSlide === section.id && section.templateSlide === "SectionHeader" && <SectionHeader mode='presenting' content={section} />}
+                        {currentSlide === section.id && section.templateSlide === "BulletList" && <BulletList mode='presenting' content={section} />}
+                        {currentSlide === section.id && section.templateSlide === "ImageWithCaption" && <ImageWithCaption mode='presenting' content={section} />}
+                        {currentSlide === section.id && section.templateSlide === "ClosingSlide" && <ClosingSide mode='presenting' content={section} />}
+                    </div>
+                ))
+            }
         </div>
     );
 };

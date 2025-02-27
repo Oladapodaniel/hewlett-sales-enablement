@@ -3,12 +3,16 @@
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { motion } from 'framer-motion';
+import { green_band, logo, logo_2 } from '@/lib/images';
+import Image from 'next/image';
+import { SectionProps } from '@/app/slide-deck/page';
 
-interface EndPagePropsProps {
+interface TitlePageProps {
     mode: 'editing' | 'presenting';
+    content: SectionProps
 }
 
-const EndPageProps: React.FC<EndPagePropsProps> = ({ mode }) => {
+const TitlePage: React.FC<TitlePageProps> = ({ mode, content }) => {
     const { selectedTheme, setSelectedTheme } = useTheme();
 
 
@@ -107,12 +111,13 @@ const EndPageProps: React.FC<EndPagePropsProps> = ({ mode }) => {
         })
     };
 
-    
+
     return (
-        <div className={`bg-[url(../assets/img/HPE_theme_assets/start_deck_bg.png)] bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen' : ''}`}>
+        <div className={`bg-[url(../assets/img/HPE_theme_assets/start_deck_bg.png)] bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen ' : 'rounded-lg'}`}>
             <div className='w-2/3'>
-                *{mode === 'editing' ? (
-                    <textarea value={selectedTheme?.slides[0]?.logo} onChange={handleChange} className='caret-white text-4xl font-medium text-white bg-transparent' />
+                {mode === 'editing' ? (
+                    // <textarea value={'LOGO'} onChange={handleChange} className='caret-white text-4xl font-medium text-white bg-transparent' />
+                    <Image src={logo_2} width={150} alt='logo' />
                 ) : (
                     <motion.div
                         initial={{ opacity: 0, x: -100 }}
@@ -120,47 +125,44 @@ const EndPageProps: React.FC<EndPagePropsProps> = ({ mode }) => {
                         transition={{ duration: 0.5 }}
                         className='animate-fadeIn animate-slideIn text-4xl font-medium text-white'
                     >
-                        {selectedTheme?.slides[0]?.logo}
+                        <Image src={logo_2} width={150} alt='logo' />
                     </motion.div>
-                    // <div className='animate-fadeIn animate-slideIn text-4xl font-medium text-white'>{selectedTheme?.slides[0]?.logo}</div>
-                    // <div className=' text-4xl font-medium text-white'>{selectedTheme?.slides[0]?.logo}</div>
-                )} *
+                )}
                 {mode === 'editing' ? (
-                    <textarea value={'Thanks'} onChange={handleTitle} className='caret-white w-full mt-[30px] text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#9886FC] to-[#5E9BFB]' />
+                    <textarea value={content.title} onChange={handleTitle} className='caret-white w-full mt-[30px] text-6xl font-bold bg-transparent text-white' />
                 ) : (
                     <motion.div
                         initial={{ opacity: 0, x: -100 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: 0.4 }}
-                        className='mt-[200px] text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#9886FC] to-[#5E9BFB]'
+                        className='mt-[200px] text-9xl font-bold text-white'
                     >
-                        Thanks
+                        {content.title}
                     </motion.div>
-                    // <div className='mt-[200px] text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#9886FC] to-[#5E9BFB]'>{selectedTheme?.slides?.[0]?.header?.text}</div>
                 )}
+                <Image src={green_band} alt='logo' className='mt-5 w-[50px]' />
                 {mode === 'editing' ? (
-                    <input value={'Oladapo Daniel'} onChange={handleBody} className='caret-white w-full mt-[40px] text-2xl bg-clip-text text-transparent bg-gradient-to-r from-[#4AA1FA] to-[#C2DFFD]' />
+                    <input value={content.content[0]} onChange={handleBody} className='caret-white w-full mt-[40px] text-3xl bg-transparent text-white' />
                 ) : (
                     <motion.div
                         initial={{ opacity: 0, x: -100 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: 0.8 }}
-                        className='mt-[100px] text-2xl bg-clip-text text-transparent bg-gradient-to-r from-[#4AA1FA] to-[#C2DFFD]'
+                        className='mt-[100px] text-4xl text-white'
                     >
-                        {'Oladapo Daniel'}
+                        {content.content[0]}
                     </motion.div>
-                    // <div className='mt-[100px] text-2xl bg-clip-text text-transparent bg-gradient-to-r from-[#4AA1FA] to-[#C2DFFD]'>{selectedTheme?.slides[0]?.body?.text}</div>
                 )}
                 {mode === 'editing' ? (
-                    <textarea value={selectedTheme?.slides[0]?.footer?.text} onChange={handleFooter} className='mt-5 caret-white text-white bg-transparent text-4xl' />
+                    <textarea value={content.content[1]} onChange={handleFooter} className='caret-white text-white bg-transparent text-2xl font-[400]' />
                 ) : (
                     <motion.div
                         initial={{ opacity: 0, x: -100 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: 1 }}
-                        className='mt-5 text-white text-4xl'
+                        className='mt-3 text-white text-3xl'
                     >
-                        {selectedTheme?.slides[0]?.footer?.text}
+                        {content.content[1]}
                     </motion.div>
                     // <div className='mt-5 text-white text-4xl'>{selectedTheme?.slides[0]?.footer?.text}</div>
                 )}
@@ -169,4 +171,4 @@ const EndPageProps: React.FC<EndPagePropsProps> = ({ mode }) => {
     );
 };
 
-export default EndPageProps;
+export default TitlePage;

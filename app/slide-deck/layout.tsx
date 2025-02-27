@@ -19,16 +19,7 @@ export default function RootLayout({
 }
 
   return (
-    <main className="bg-[#e8eafc]">
-      <div className="bg-white">
-        <div className='container mx-auto flex justify-between py-5'>
-          <Image
-            src={logo}
-            alt='logo'
-          />
-          <Button onClick={handlePresent} className="flex self-end rounded-[12px] bg-[#03A983] shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af] mb-5" type="submit">Present</Button>
-        </div>
-      </div>
+    <main>
       <div
       >
         {children}

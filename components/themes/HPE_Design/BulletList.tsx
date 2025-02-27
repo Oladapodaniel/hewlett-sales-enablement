@@ -3,12 +3,16 @@
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { motion } from 'framer-motion';
+import { box_green_band, green_band } from '@/lib/images';
+import Image from 'next/image';
+import { SectionProps } from '@/app/slide-deck/page';
 
-interface StartPageProps {
+interface BulletListProps {
     mode: 'editing' | 'presenting';
+    content: SectionProps
 }
 
-const StartPage: React.FC<StartPageProps> = ({ mode }) => {
+const BulletList: React.FC<BulletListProps> = ({ mode, content }) => {
     const { selectedTheme, setSelectedTheme } = useTheme();
 
 
@@ -58,7 +62,7 @@ const StartPage: React.FC<StartPageProps> = ({ mode }) => {
         });
     };
 
-    const handleBody = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleBody = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newBodyText = event.target.value;
         if (selectedTheme === null) return;
         setSelectedTheme((prevTheme) => {
@@ -107,64 +111,53 @@ const StartPage: React.FC<StartPageProps> = ({ mode }) => {
         })
     };
 
-    
+
     return (
-        <div className={`bg-[url(../assets/img/HPE_theme_assets/start_deck_bg.png)] bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen' : ''}`}>
-            <div className='w-2/3'>
-                {mode === 'editing' ? (
-                    <textarea value={'LOGO'} onChange={handleChange} className='caret-white text-4xl font-medium text-white bg-transparent' />
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, x: -100 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className='animate-fadeIn animate-slideIn text-4xl font-medium text-white'
-                    >
-                        {selectedTheme?.slides[0]?.logo}
-                    </motion.div>
-                )}
-                {mode === 'editing' ? (
-                    <textarea value={'SPOCK SYSTEM ARCHITECTURE'} onChange={handleTitle} className='caret-white w-full mt-[30px] text-6xl font-bold bg-transparent text-white' />
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, x: -100 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.4 }}
-                        className='mt-[200px] text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#9886FC] to-[#5E9BFB]'
-                    >
-                        {selectedTheme?.slides?.[0]?.header?.text}
-                    </motion.div>
-                    // <div className='mt-[200px] text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#9886FC] to-[#5E9BFB]'>{selectedTheme?.slides?.[0]?.header?.text}</div>
-                )}
-                {mode === 'editing' ? (
-                    <input value={selectedTheme?.slides[0]?.body?.text} onChange={handleBody} className='caret-white w-full mt-[40px] text-2xl bg-clip-text text-transparent bg-gradient-to-r from-[#4AA1FA] to-[#C2DFFD]' />
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, x: -100 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.8 }}
-                        className='mt-[100px] text-2xl bg-clip-text text-transparent bg-gradient-to-r from-[#4AA1FA] to-[#C2DFFD]'
-                    >
-                        {selectedTheme?.slides[0]?.body?.text}
-                    </motion.div>
-                    // <div className='mt-[100px] text-2xl bg-clip-text text-transparent bg-gradient-to-r from-[#4AA1FA] to-[#C2DFFD]'>{selectedTheme?.slides[0]?.body?.text}</div>
-                )}
-                {mode === 'editing' ? (
-                    <textarea value={selectedTheme?.slides[0]?.footer?.text} onChange={handleFooter} className='mt-5 caret-white text-white bg-transparent text-4xl' />
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, x: -100 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 1 }}
-                        className='mt-5 text-white text-4xl'
-                    >
-                        {selectedTheme?.slides[0]?.footer?.text}
-                    </motion.div>
-                    // <div className='mt-5 text-white text-4xl'>{selectedTheme?.slides[0]?.footer?.text}</div>
-                )}
+        <div className={`bg-white p-12 w-full ${mode === 'presenting' ? 'h-screen' : 'rounded-lg'}`}>
+            <div className='relative h-full w-2/3'>
+                <div>
+                    <div className='text-3xl font-[600]'>{content.title}</div>
+                    <Image src={green_band} alt='logo' className='w-[50px] mt-1' />
+                </div>
+                <div className='mt-7'>
+                    {mode === 'editing' ? (
+                        <div className='flex flex-col'>
+                            {content.content.map((i, index) => (
+                                <div className='flex gap-7 w-full' key={index}>
+                                    <div className='text-6xl'>
+                                        &#8226;
+                                    </div>
+                                    <textarea value={i} onChange={handleChange} className='text-2xl font-medium bg-transparent mt-5 w-full' />
+                                </div>
+                            ))}
+
+                        </div>
+                    ) : (
+                        <div className='mt-[100px]'>
+                            {content.content.map((i, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, x: -100 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.5, delay: index * 0.2 }}
+                                    className='animate-fadeIn animate-slideIn text-4xl font-medium text-white'
+                                >
+                                    <div className='flex gap-7 w-full' >
+                                        <div className='text-black text-6xl'>
+                                            &#8226;
+                                        </div>
+                                        <div className='text-3xl font-medium bg-transparent mt-5 text-black'>{i}</div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+
+                </div>
+                <Image src={box_green_band} alt='logo' className='mt-5 w-[50px] absolute bottom-0' />
             </div>
         </div>
     );
 };
 
-export default StartPage;
+export default BulletList;

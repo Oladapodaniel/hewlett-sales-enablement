@@ -143,7 +143,7 @@ export const themes: ThemesInterface[] = [
                     text: '',
                     fontSize: ''
                 },
-                bg: '../assets/img/start_deck_bg.png',
+                bg: '../assets/img/HPE_theme_assets/start_deck_bg.png',
                 logo: 'YOUR LOGO',
                 logoFontSize: '4xl',
                 logoFontWeight: 'medium',
@@ -237,7 +237,7 @@ export const themes: ThemesInterface[] = [
                     text: '',
                     fontSize: ''
                 },
-                bg: '../assets/img/start_deck_bg.png',
+                bg: '../assets/img/HPE_theme_assets/start_deck_bg.png',
                 logo: 'YOUR LOGO',
                 logoFontSize: '4xl',
                 logoFontWeight: 'medium',
@@ -331,7 +331,7 @@ export const themes: ThemesInterface[] = [
                     text: '',
                     fontSize: ''
                 },
-                bg: '../assets/img/start_deck_bg.png',
+                bg: '../assets/img/HPE_theme_assets/start_deck_bg.png',
                 logo: 'YOUR LOGO',
                 logoFontSize: '4xl',
                 logoFontWeight: 'medium',
@@ -425,7 +425,7 @@ export const themes: ThemesInterface[] = [
                     text: '',
                     fontSize: ''
                 },
-                bg: '../assets/img/start_deck_bg.png',
+                bg: '../assets/img/HPE_theme_assets/start_deck_bg.png',
                 logo: 'YOUR LOGO',
                 logoFontSize: '4xl',
                 logoFontWeight: 'medium',

@@ -22,8 +22,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import DraggableSection from '@/components/reusables/DragAndDropCards';
+import { useRouter } from 'next/navigation';
 
 const GenerateProposalPage: React.FC = () => {
+    const router = useRouter();
     const [loading, setLoading] = React.useState(true);
     const [selectedTheme, setSelectedTheme] = React.useState("1");
     const [sections, setSections] = useState([
@@ -235,7 +237,7 @@ const GenerateProposalPage: React.FC = () => {
                                             <div className='bg-secondary px-4 py-1 rounded-full'>{sections.length} Slides</div>
                                         </div>
                                         <div>
-                                            <Button className="rounded-full text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">Generate Presentation
+                                            <Button onClick={() =>router.push("/slide-deck")} className="rounded-full text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">Generate Presentation
                                                 <ArrowRightIcon className="w-6 h-5" />
                                             </Button>
                                         </div>
