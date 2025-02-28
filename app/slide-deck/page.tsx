@@ -17,60 +17,60 @@ export interface SectionProps {
 }
 const Page: React.FC = () => {
     const { selectedTheme } = useTheme();
-    const { slideStates, setSlideState } = useTheme();
+    const { slideStates } = useTheme();
     
-    const sections: SectionProps[] = ([
-            {
-                title: "SUSTAINABLE DATA CENTERS",
-                id: 1,
-                templateSlide: "TitleSlide",
-                content: [
-                    'Joe Glenski',
-                    'May 20, 2021'
-                ],
-                thumbnail: thumbnail_first
-            },
-            {
-                title: "Introduction",
-                id: 2,
-                templateSlide: "SectionHeader",
-                content: [
-                    'A brief overview of spoke systems architecture.',
-                ],
-                thumbnail: thumbnail_second
-            },
-            {
-                title: "Key benefits of Sustainable Data Centers",
-                id: 3,
-                templateSlide: "BulletList",
-                content: [
-                    'Cost Savings: Reduced energy consumption leads to significant cost reductions.',
-                    'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
-                    'Compliance: Aligns with global sustainability goals and regulations.',
-                    'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
-                ],
-                thumbnail: thumbnail_third
-            },
-            {
-                title: "Energy Efficiency Technologies",
-                id: 4,
-                templateSlide: "ImageWithCaption",
-                content: [
-                    'Free Cooling: Utilizes outside air to cool data centers, reducing reliance on traditional cooling systems.',
-                    // 'Virtualization: Increases server utilization rates, decreasing the number of physical servers needed.'
-                ],
-                thumbnail: thumbnail_fourth
-            },
-            {
-                title: "Thank You",
-                id: 5,
-                templateSlide: "ClosingSlide",
-                content: [
-                    'glenski@hpe.com',
-                ],
-                thumbnail: thumbnail_fifth
-            }
-        ])
+    // const sections: SectionProps[] = ([
+    //         {
+    //             title: "SUSTAINABLE DATA CENTERS",
+    //             id: 1,
+    //             templateSlide: "TitleSlide",
+    //             content: [
+    //                 'Joe Glenski',
+    //                 'May 20, 2021'
+    //             ],
+    //             thumbnail: thumbnail_first
+    //         },
+    //         {
+    //             title: "Introduction",
+    //             id: 2,
+    //             templateSlide: "SectionHeader",
+    //             content: [
+    //                 'A brief overview of spoke systems architecture.',
+    //             ],
+    //             thumbnail: thumbnail_second
+    //         },
+    //         {
+    //             title: "Key benefits of Sustainable Data Centers",
+    //             id: 3,
+    //             templateSlide: "BulletList",
+    //             content: [
+    //                 'Cost Savings: Reduced energy consumption leads to significant cost reductions.',
+    //                 'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
+    //                 'Compliance: Aligns with global sustainability goals and regulations.',
+    //                 'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
+    //             ],
+    //             thumbnail: thumbnail_third
+    //         },
+    //         {
+    //             title: "Energy Efficiency Technologies",
+    //             id: 4,
+    //             templateSlide: "ImageWithCaption",
+    //             content: [
+    //                 'Free Cooling: Utilizes outside air to cool data centers, reducing reliance on traditional cooling systems.',
+    //                 // 'Virtualization: Increases server utilization rates, decreasing the number of physical servers needed.'
+    //             ],
+    //             thumbnail: thumbnail_fourth
+    //         },
+    //         {
+    //             title: "Thank You",
+    //             id: 5,
+    //             templateSlide: "ClosingSlide",
+    //             content: [
+    //                 'glenski@hpe.com',
+    //             ],
+    //             thumbnail: thumbnail_fifth
+    //         }
+    //     ])
 
     useEffect(() => {
         console.log('Selected Theme:', selectedTheme);

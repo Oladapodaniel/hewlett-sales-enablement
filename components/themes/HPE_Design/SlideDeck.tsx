@@ -10,7 +10,7 @@ import ImageWithCaption from "./ImageWithCaption";
 import ClosingSide from "./ClosingSlide";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { CircleMinus, CirclePlus, Download, Play, SparklesIcon } from "lucide-react";
+import { CircleMinus, CirclePlus, Download, Play } from "lucide-react";
 // import {
 //     DropdownMenu,
 //     DropdownMenuContent,
@@ -79,7 +79,7 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
         setSlides(updatedSlides);
     };
 
-    const imagesArray = [
+    const imagesArray = useMemo(() => [
         {
             thumbnail: thumbnail_first,
             templateSlide: 'TitleSlide'
@@ -100,7 +100,29 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
             thumbnail: thumbnail_fifth,
             templateSlide: 'ClosingSlide'
         }
-    ];
+    ], []);
+    // const imagesArray = [
+    //     {
+    //         thumbnail: thumbnail_first,
+    //         templateSlide: 'TitleSlide'
+    //     },
+    //     {
+    //         thumbnail: thumbnail_second,
+    //         templateSlide: 'SectionHeader'
+    //     },
+    //     {
+    //         thumbnail: thumbnail_third,
+    //         templateSlide: 'BulletList'
+    //     },
+    //     {
+    //         thumbnail: thumbnail_fourth,
+    //         templateSlide: 'ImageWithCaption'
+    //     },
+    //     {
+    //         thumbnail: thumbnail_fifth,
+    //         templateSlide: 'ClosingSlide'
+    //     }
+    // ];
 
     const slideStateWithThumbnail = useMemo(() => {
         return slidesState.map(slide => {
