@@ -19,70 +19,15 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import DraggableSection from '@/components/reusables/DragAndDropCards';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '@/context/ThemeContext';
+import { SectionProps } from '@/app/slide-deck/page';
 
 const GenerateProposalPage: React.FC = () => {
     const router = useRouter();
     const [loading, setLoading] = React.useState(true);
     const [selectedTheme, setSelectedTheme] = React.useState("1");
-    const [sections, setSections] = useState([
-        {
-            title: "Introduction",
-            content: [
-                'Sustainable data centers: are designed to minimize environmental impact by optimizing energy efficiency and utilizing renewable energy sources.',
-                '2% of global CO2 emissions:  Additionally, many sustainable data centers implement advanced cooling technologies and innovative waste management practices to further decrease their ecological footprint. They play a crucial role in reducing the carbon footprint of the IT industry, which accounts for approximately'
-            ]
-        },
-        {
-            title: "Importance of Sustainability",
-            content: [
-                'Growing awareness about climate change and resource depletion drives the need for sustainable practices.',
-                'Sustainable data centers help companies meet regulatory requirements and enhance corporate reputation.'
-            ]
-        },
-        {
-            title: "Key benefits of Sustainable Data Centers",
-            content: [
-                'Cost Savings: Reduced energy consumption leads to significant cost reductions.',
-                'Resilience: Use of renewable energy and efficient cooling systems enhances operational resilience.',
-                'Compliance: Aligns with global sustainability goals and regulations.'
-            ]
-        },
-        {
-            title: "Energy Efficiency Technologies",
-            content: [
-                'Free Cooling: Utilizes outside air to cool data centers, reducing reliance on traditional cooling systems.',
-                'Virtualization: Increases server utilization rates, decreasing the number of physical servers needed.'
-            ]
-        },
-        {
-            title: "Renewable Energy Sources",
-            content: [
-                'Growing awareness about climate change and resource depletion drives the need for sustainable practices.',
-                'Sustainable data centers help companies meet regulatory requirements and enhance corporate reputation.'
-            ]
-        },
-        {
-            title: "Renewable Energy Sources",
-            content: [
-                'Installation of on-site solar panels and wind turbines to power data centers.',
-                'Partnerships with renewable energy providers to ensure a green energy supply.'
-            ]
-        },
-        {
-            title: "Innovative Cooling System",
-            content: [
-                'Liquid Cooling: Transfers heat more efficiently than air cooling, reducing energy consumption.',
-                'Submersion Cooling: Servers are submerged in a non-conductive liquid, facilitating efficient heat dissipation.'
-            ]
-        },
-        {
-            title: "Case Study: Google Data Centers",
-            content: [
-                'Google aims to operate on 100% renewable energy and improve energy efficiency by constantly innovating.',
-                'Their data centers are twice as energy-efficient as a typical enterprise data center.'
-            ]
-        },
-    ])
+    const { slideStates, setSlideState } = useTheme();
+    // const [sections, setSections] = useState([...slideStates])
 
     const contentThemes = [
         {
@@ -116,12 +61,12 @@ const GenerateProposalPage: React.FC = () => {
             selected: "6"
         },
     ]
-    interface Section {
-        title: string;
-        content: string[];
-    }
+    // interface Section {
+    //     title: string;
+    //     content: string[];
+    // }
 
-    function reorder(list: Section[], startIndex: number, endIndex: number): Section[] {
+    function reorder(list: SectionProps[], startIndex: number, endIndex: number): SectionProps[] {
         const result = [...list];
         const [removed] = result.splice(startIndex, 1);
         result.splice(endIndex, 0, removed);
@@ -135,8 +80,14 @@ const GenerateProposalPage: React.FC = () => {
     // }
 
     const moveSection = (dragIndex: number, hoverIndex: number) => {
-        setSections((prev) => reorder(prev, dragIndex, hoverIndex));
+        // setSections((prev) => reorder(prev, dragIndex, hoverIndex));
+        const order: SectionProps[] = reorder(slideStates, dragIndex, hoverIndex);
+        setSlideState(order)
     };
+
+    useEffect(() => {
+        console.log(slideStates, 'here')
+    })
 
 
     const headerRight = () => (
@@ -178,7 +129,7 @@ const GenerateProposalPage: React.FC = () => {
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: .3 }}
-                                className="font-[500] bg-no-repeat bg-[50%] text-5xl md:text-[60px] pt-[10px] px-[10px] pb-[10px] mt-8 text-center leading-[4rem]" style={{ backgroundPosition: 'right 70px' }}>Generating a proposal for the struture of the deck<Elipsis /></motion.h3>
+                                className="font-[500] bg-no-repeat bg-[50%] text-5xl md:text-[60px] pt-[10px] px-[10px] pb-[10px] mt-8 text-center leading-[4rem]" style={{ backgroundPosition: 'right 70px' }}>Generating a proposal for the structure of the deck<Elipsis /></motion.h3>
                             <div className='mt-10'>
                                 <Spinner />
                             </div>
@@ -241,7 +192,7 @@ const GenerateProposalPage: React.FC = () => {
                                                     transition={{ duration: 0.5 }}
                                                 >Presentation Outline</motion.span>
                                             </div>
-                                            <div className='bg-secondary px-4 py-1 rounded-full'>{sections.length} Slides</div>
+                                            <div className='bg-secondary px-4 py-1 rounded-full'>{slideStates.length} Slides</div>
                                         </div>
                                         <div>
                                             <Button onClick={() =>router.push("/slide-deck")} className="rounded-full text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">Generate Presentation
@@ -251,7 +202,7 @@ const GenerateProposalPage: React.FC = () => {
                                     </div>
                                     <DndProvider backend={HTML5Backend}>
                                         <div className="p-4">
-                                            {sections.map((section, index) => (
+                                            {slideStates.map((section, index) => (
                                                 <DraggableSection
                                                     key={index}
                                                     section={section}

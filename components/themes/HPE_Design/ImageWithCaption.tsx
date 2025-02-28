@@ -13,28 +13,21 @@ interface ImageWithCaptionProps {
 }
 
 const ImageWithCaption: React.FC<ImageWithCaptionProps> = ({ mode, content }) => {
-    const { selectedTheme, setSelectedTheme } = useTheme();
+        const { setSlideState } = useTheme();
 
 
-    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newLogoText = event.target.value;
-        if (selectedTheme === null) return;
-        setSelectedTheme((prevTheme) => {
-            if (prevTheme === null) return null;
-            return {
-                ...prevTheme,
-                slides: prevTheme.slides.map((slide, index) =>
-                    index === 0 ? { ...slide, header: { ...slide.header, text: newLogoText } } : slide
-                )
-                // slides: [
-                //     ...prevTheme.slides,
-                //     {
-                //         ...prevTheme.slides[0],
-                //         logo: newLogoText,
-                //     },
-                // ],
-            };
-        });
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
+       const updatedContent = [...content.content];
+               const findUpdatedContent = updatedContent.findIndex((item, indexx) => indexx === index);
+               if (findUpdatedContent !== -1) {
+                   updatedContent[findUpdatedContent] = event.target.value;
+               }
+       
+               setSlideState((prevState: SectionProps[]) =>
+                   prevState.map(section =>
+                       section === content ? { ...section, content: updatedContent } : section
+                   )
+               );
     };
 
 
@@ -54,7 +47,7 @@ const ImageWithCaption: React.FC<ImageWithCaptionProps> = ({ mode, content }) =>
                         <div className='flex flex-col px-12'>
                             {content.content.map((i, index) => (
                                 <div className='flex gap-7 w-full' key={index}>
-                                    <textarea value={i} onChange={handleChange} className='text-2xl font-medium bg-transparent mt-5 w-full' />
+                                    <textarea value={i} onChange={(evt) => handleChange(evt, index)} className='text-2xl font-medium bg-transparent mt-5 w-full' />
                                 </div>
                             ))}
                         </div>
@@ -69,7 +62,7 @@ const ImageWithCaption: React.FC<ImageWithCaptionProps> = ({ mode, content }) =>
                                     className='animate-fadeIn animate-slideIn text-4xl font-medium text-white'
                                 >
                                     <div className='flex gap-7 w-full' key={index}>
-                                        <textarea value={i} onChange={handleChange} className='text-3xl text-black font-medium bg-transparent mt-5 w-full' />
+                                        <div className='text-3xl font-medium bg-transparent mt-5 text-black'>{i}</div>
                                     </div>
                                 </motion.div>
                             ))}

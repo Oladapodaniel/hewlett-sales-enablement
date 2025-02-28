@@ -13,28 +13,31 @@ interface BulletListProps {
 }
 
 const BulletList: React.FC<BulletListProps> = ({ mode, content }) => {
-    const { selectedTheme, setSelectedTheme } = useTheme();
+    const { setSlideState } = useTheme();
 
+    const handleTitle = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const updatedTitle = event.target.value;
 
-    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newLogoText = event.target.value;
-        if (selectedTheme === null) return;
-        setSelectedTheme((prevTheme) => {
-            if (prevTheme === null) return null;
-            return {
-                ...prevTheme,
-                slides: prevTheme.slides.map((slide, index) =>
-                    index === 0 ? { ...slide, header: { ...slide.header, text: newLogoText } } : slide
-                )
-                // slides: [
-                //     ...prevTheme.slides,
-                //     {
-                //         ...prevTheme.slides[0],
-                //         logo: newLogoText,
-                //     },
-                // ],
-            };
-        });
+        setSlideState((prevState: SectionProps[]) =>
+            prevState.map(section =>
+            section === content ? { ...section, title: updatedTitle } : section
+            )
+        );
+    }
+
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
+        const updatedContent = [...content.content];
+        const findUpdatedContent = updatedContent.findIndex((item, indexx) => indexx === index);
+        console.log(index)
+        if (findUpdatedContent !== -1) {
+            updatedContent[findUpdatedContent] = event.target.value;
+        }
+
+        setSlideState((prevState: SectionProps[]) =>
+            prevState.map(section =>
+                section === content ? { ...section, content: updatedContent } : section
+            )
+        );
     };
 
 
@@ -43,7 +46,15 @@ const BulletList: React.FC<BulletListProps> = ({ mode, content }) => {
         <div className={`bg-white p-12 w-full ${mode === 'presenting' ? 'h-screen' : 'rounded-lg'}`}>
             <div className='relative h-full w-2/3'>
                 <div>
-                    <div className='text-3xl font-[600]'>{content.title}</div>
+                    {mode === 'editing' ? (
+                        <div className='flex flex-col'>
+                                <textarea value={content.title} onChange={handleTitle} className='text-2xl font-medium bg-transparent mt-5 w-full' />
+                        </div>
+                    ) : (
+                        <div className='mt-[100px]'>
+                                <div className='text-3xl font-[600]'>{content.title}</div>
+                        </div>
+                    )}
                     <Image src={green_band} alt='logo' className='w-[50px] mt-1' />
                 </div>
                 <div className='mt-7'>
@@ -54,7 +65,8 @@ const BulletList: React.FC<BulletListProps> = ({ mode, content }) => {
                                     <div className='text-6xl'>
                                         &#8226;
                                     </div>
-                                    <textarea value={i} onChange={handleChange} className='text-2xl font-medium bg-transparent mt-5 w-full' />
+
+                                    <textarea value={i} onChange={(evt) => handleChange(evt, index)} className='text-2xl font-medium bg-transparent mt-5 w-full' />
                                 </div>
                             ))}
 

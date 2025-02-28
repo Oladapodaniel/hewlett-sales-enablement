@@ -13,10 +13,11 @@ export interface SectionProps {
     templateSlide: string;
     content: string[];
     thumbnail: StaticImageData
+    isOpen?: boolean
 }
 const Page: React.FC = () => {
     const { selectedTheme } = useTheme();
-
+    const { slideStates, setSlideState } = useTheme();
     
     const sections: SectionProps[] = ([
             {
@@ -78,7 +79,7 @@ const Page: React.FC = () => {
     const renderTheme = () => {
         // switch (selectedTheme?.id) {
         //     case "modern":
-                return <SlideDeck type="editing" slides={sections} />
+                return <SlideDeck type="editing" slides={slideStates} />
             //   case "minimal":
             //     return <MinimalTheme content={content} setContent={setContent} />;
             // default:

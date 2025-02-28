@@ -29,6 +29,10 @@ import { Textarea } from './ui/textarea'
 import { salesforce_logo } from '@/lib/images'
 import ResizableTextArea from './reusables/ResizableTextArea'
 import { audience, language, pagesRange, tone } from '@/constants/util'
+import { EnterPromptSlide } from '@/lib/actions/slide-generation/enter-prompt-slide'
+import { EnterPromptInstructions } from '@/constants/modelInstructions'
+import { useTheme } from '@/context/ThemeContext'
+import { extractOpenAIResponseContent, OpenAIResponse } from '@/lib/utils'
 
 
 
@@ -38,6 +42,12 @@ const HeroSection = () => {
     const [value, setValue] = useState<string>('');
     const textAreaRef = useRef<HTMLTextAreaElement>(null)
     const [manualFocus, setManualfocus] = useState<HTMLTextAreaElement | null>(null)
+    const [loading, setLoading] = useState<boolean>(false)
+    const { setSlideState } = useTheme();
+    const [selectedPages, setSelectedPages] = useState<string>("");
+    const [selectedLanguage, setSelectedLanguages] = useState<string>("");
+    const [selectedTone, setSelectedTone] = useState<string>("");
+    const [selectedAudience, setSelectedAudience] = useState<string>("");
 
 
 
@@ -53,11 +63,32 @@ const HeroSection = () => {
         // 'Create a slide deck for a sales proposal to Microsoft',
     ]
 
-    // const [isThemeDisplayed, setIsThemeDisplayed] = useState<boolean>(false)
-    // const [allThemes, setallThemes] = useState<ThemesInterface[]>([])
-    // const [isCustomerDataDisplayed, setIsCustomerDataDisplayed] = useState<boolean>(false)
+    const refinePromptRequest = async () => {
+        setLoading(true);
+        const promptParameters = {
+            user_prompt: value,
+            pages: selectedPages,
+            tone: selectedTone,
+            output_language: selectedLanguage,
+            audience: selectedAudience,
+        }
 
+        const payload = EnterPromptInstructions(promptParameters)
+        try {
 
+            const result = await EnterPromptSlide(payload) as OpenAIResponse;
+            setLoading(false);
+            console.log(result, 'result')
+            
+            const generatedSlideContent = extractOpenAIResponseContent(result);
+            console.log(generatedSlideContent)
+            setSlideState(generatedSlideContent.slides)
+            router.push('/refine-request-topic')
+        } catch (error) {
+            setLoading(false);
+            console.error(error)
+        }
+    }
 
     return (
         <div className="bg-[url('../assets/img/banner_bg.svg')] bg-no-repeat bg-center bg-top bg-cover">
@@ -111,7 +142,9 @@ const HeroSection = () => {
                                                 }}
 
                                             />
-                                            <Button onClick={() => router.push('/refine-request-topic')} className="absolute bottom-1 right-1 rounded-[12px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit"><PaperPlaneIcon /></Button>
+                                            <Button disabled={loading} onClick={refinePromptRequest} className="absolute bottom-1 right-1 rounded-[12px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                                <PaperPlaneIcon />
+                                            </Button>
                                         </div>
                                         <div>
                                             <div className="space-x-2">
@@ -130,52 +163,52 @@ const HeroSection = () => {
                                         <div className='flex flex-wrap gap-3'>
                                             <div>
                                                 <div className='text-sm font-medium text-neutral-600 mb-1'>Slides</div>
-                                                <Select>
+                                                <Select value={selectedPages} onValueChange={setSelectedPages}>
                                                     <SelectTrigger className="w-[160px] bg-secondary border-none rounded-lg">
                                                         <SelectValue placeholder="Slides" />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectGroup>
-                                                            {pagesRange.map((i, index) => (<SelectItem key={index} className='text-md' value={index.toString()}>{i}</SelectItem>))}
+                                                            {pagesRange.map((i, index) => (<SelectItem key={index} className='text-md' value={i}>{i}</SelectItem>))}
                                                         </SelectGroup>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
                                             <div>
                                                 <div className='text-sm font-medium text-neutral-600 mb-1'>Output Language</div>
-                                                <Select>
+                                                <Select value={selectedLanguage} onValueChange={setSelectedLanguages}>
                                                     <SelectTrigger className="w-[160px] bg-secondary border-none rounded-lg">
                                                         <SelectValue placeholder="Language" />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectGroup>
-                                                            {language.map((i, index) => (<SelectItem key={index} className='text-md' value={index.toString()}>{i}</SelectItem>))}
+                                                            {language.map((i, index) => (<SelectItem key={index} className='text-md' value={i}>{i}</SelectItem>))}
                                                         </SelectGroup>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
                                             <div>
                                                 <div className='text-sm font-medium text-neutral-600 mb-1'>Tone</div>
-                                                <Select>
+                                                <Select value={selectedTone} onValueChange={setSelectedTone}>
                                                     <SelectTrigger className="w-[160px] bg-secondary border-none rounded-lg">
                                                         <SelectValue placeholder="Tone" />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectGroup>
-                                                            {tone.map((i, index) => (<SelectItem key={index} className='text-md' value={index.toString()}>{i}</SelectItem>))}
+                                                            {tone.map((i, index) => (<SelectItem key={index} className='text-md' value={i}>{i}</SelectItem>))}
                                                         </SelectGroup>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
                                             <div>
                                                 <div className='text-sm font-medium text-neutral-600 mb-1'>Audience</div>
-                                                <Select>
+                                                <Select value={selectedAudience} onValueChange={setSelectedAudience}>
                                                     <SelectTrigger className="w-[160px] bg-secondary border-none rounded-lg">
                                                         <SelectValue placeholder="Audience" />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectGroup>
-                                                            {audience.map((i, index) => (<SelectItem key={index} className='text-md' value={index.toString()}>{i}</SelectItem>))}
+                                                            {audience.map((i, index) => (<SelectItem key={index} className='text-md' value={i}>{i}</SelectItem>))}
                                                         </SelectGroup>
                                                     </SelectContent>
                                                 </Select>

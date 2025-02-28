@@ -13,54 +13,33 @@ interface ClosingSideProps {
 }
 
 const ClosingSide: React.FC<ClosingSideProps> = ({ mode, content }) => {
-    const { selectedTheme, setSelectedTheme } = useTheme();
+    const { setSlideState } = useTheme();
 
     const handleTitle = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newTitleText = event.target.value;
-        if (selectedTheme === null) return;
-        setSelectedTheme((prevTheme) => {
-            if (prevTheme === null) return null;
-            return {
-                ...prevTheme,
-                slides: prevTheme.slides.map((slide, index) =>
-                    index === 0 ? { ...slide, header: { ...slide.header, text: newTitleText } } : slide
-                )
-                // slides: [
-                //     ...prevTheme.slides,
-                //     {
-                //         ...prevTheme.slides[0],
-                //         header: {
-                //             ...prevTheme.slides[0].header,
-                //             text: newTitleText,
-                //         },
-                //     },
-                // ],
+        setSlideState((prevState: SectionProps[]) => {
+            const updatedState = [...prevState];
+            const findSlideIndex = updatedState.findIndex(i => i.id === content.id);
+            updatedState[findSlideIndex] = {
+                ...updatedState[findSlideIndex],
+                title: newTitleText
             };
+            return updatedState;
         });
     };
 
     const handleBody = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newBodyText = event.target.value;
-        if (selectedTheme === null) return;
-        setSelectedTheme((prevTheme) => {
-            if (prevTheme === null) return null;
-            return {
-                ...prevTheme,
-                slides: prevTheme.slides.map((slide, index) =>
-                    index === 0 ? { ...slide, header: { ...slide.header, text: newBodyText } } : slide
-                )
-                // slides: [
-                //     ...prevTheme.slides,
-                //     {
-                //         ...prevTheme.slides[0],
-                //         body: {
-                //             ...prevTheme.slides[0].body,
-                //             text: newBodyText,
-                //         },
-                //     },
-                // ],
+        setSlideState((prevState: SectionProps[]) => {
+            const updatedState = [...prevState];
+            const findSlideIndex = updatedState.findIndex(i => i.id === content.id);
+            updatedState[findSlideIndex] = {
+                ...updatedState[findSlideIndex],
+                content: [newBodyText, ...updatedState[findSlideIndex].content.slice(1)]
             };
+            return updatedState;
         });
+
     };
 
 
