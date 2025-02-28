@@ -78,7 +78,6 @@ const HeroSection = () => {
 
             const result = await EnterPromptSlide(payload) as OpenAIResponse;
             setLoading(false);
-            console.log(result, 'result')
             
             const generatedSlideContent = extractOpenAIResponseContent(result);
             console.log(generatedSlideContent)
