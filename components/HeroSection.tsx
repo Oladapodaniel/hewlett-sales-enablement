@@ -98,12 +98,12 @@ const HeroSection = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: .3 }}
-                        className="font-[700] bg-[url('../assets/img/banner_title_zs.svg')] bg-no-repeat bg-[50%] text-[60px] pt-[10px] px-[10px] pb-[10px] mt-8 text-center" style={{ backgroundPosition: 'right 70px' }}>AI generates slide instantly</motion.h3>
+                        className="font-[700] bg-[url('../assets/img/banner_title_zs.svg')] bg-no-repeat bg-[50%] text-[60px] pt-[10px] px-[10px] pb-[10px] mt-8 text-center" style={{ backgroundPosition: 'right 70px' }}>AI generates slides instantly</motion.h3>
                     <motion.p
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: .5 }}
-                        className='mt-3 text-[#585858] font-[300] text-[24px] text-md text-center'>Enter your Topics, AI automatically generates the slide</motion.p>
+                        className='mt-3 text-[#585858] font-[300] text-[24px] text-md text-center'>Enter your Topics, AI automatically generate the slides</motion.p>
 
                     {/* <div className='container mx-auto flex justify-center'> */}
                     <motion.div className='mt-10 w-full xl:w-2/3 2xl:w-3/5'
