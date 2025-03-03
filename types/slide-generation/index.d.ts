@@ -1,3 +1,5 @@
+import { SectionProps } from "@/app/slide-deck/page";
+
 export interface Slide {
     title: string;
     id: number;
@@ -15,7 +17,7 @@ export interface EnterPromptSlideProps {
     user_prompt: string;
     username: string;
     password: string;
-    temperature: number;
+    temperature: number | slide;
 }
 
 declare type EnterPromptInstructionsProps = {
@@ -24,4 +26,9 @@ declare type EnterPromptInstructionsProps = {
     tone: string;
     output_language: string;
     audience: string;
+}
+
+declare type RefineSingleSlideInstructionsProps = {
+    slideToUpdate: SectionProps, 
+    user_prompt: string
 }

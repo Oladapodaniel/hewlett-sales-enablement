@@ -33,3 +33,14 @@ export const pagesRange = [
     '10 - 20',
     '20 -30'
 ]
+
+export const editWithAIOptions = [
+    { text: "Improve Writing" },
+    { text: "Fix Spelling & Grammar" },
+    { text: "Translate" },
+    { text: "Make Longer" },
+    { text: "Make Shorter" },
+    { text: "Simplify Language" },
+    { text: "Be more specific" },
+    { text: "Add a smart summary" },
+]

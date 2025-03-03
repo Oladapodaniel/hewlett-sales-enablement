@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from "react";
+import React, { useRef, useState, useMemo, useEffect } from "react";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Image, { StaticImageData } from "next/image";
@@ -10,15 +10,15 @@ import ImageWithCaption from "./ImageWithCaption";
 import ClosingSide from "./ClosingSlide";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { CircleMinus, CirclePlus, Download, Play } from "lucide-react";
-// import {
-//     DropdownMenu,
-//     DropdownMenuContent,
-//     DropdownMenuItem,
-//     DropdownMenuLabel,
-//     DropdownMenuSeparator,
-//     DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu"
+import { AlignLeft, ChevronDown, CircleMinus, CirclePlus, Download, Play, SparklesIcon } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 // import { Input } from "@/components/ui/input";
 import { useDrag, useDrop } from 'react-dnd';
 import { motion } from 'framer-motion';
@@ -28,9 +28,15 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { DragHandleDots2Icon } from "@radix-ui/react-icons";
+import { DragHandleDots2Icon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import { useTheme } from "@/context/ThemeContext";
 import { thumbnail_fifth, thumbnail_first, thumbnail_fourth, thumbnail_second, thumbnail_third } from "@/lib/images";
+import { Input } from "@/components/ui/input";
+import { editWithAIOptions } from "@/constants/util";
+import { RefineSingleSlideInstructions } from "@/constants/modelInstructions";
+import { EnterPromptSlide } from "@/lib/actions/slide-generation/enter-prompt-slide";
+// import { EnterPromptSlideProps } from "@/types/slide-generation";
+import { extractOpenAIResponseContent, OpenAIResponse } from "@/lib/utils";
 
 
 interface SlideDeckProps {
@@ -42,22 +48,12 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     const router = useRouter();
     const [slidesState, setSlides] = useState(slides);
     const { slideStates, setSlideState } = useTheme()
-    // const [titleOpen, setTitleOpen] = useState<boolean>(false);
-    // const [sectionHeaderOpen, setsectionHeaderOpen] = useState<boolean>(false);
-    // const [bulletListOpen, setbulletListOpen] = useState<boolean>(false);
-    // const [imageWithCaptionOpen, setimageWithCaptionOpen] = useState<boolean>(false);
-    // const [closingSlideOpen, setclosingSlideOpen] = useState<boolean>(false);
-
-    // const editWithAIOptions = [
-    //     { text: "Improve Writing" },
-    //     { text: "Fix Spelling & Grammar" },
-    //     { text: "Translate" },
-    //     { text: "Make Longer" },
-    //     { text: "Make Shorter" },
-    //     { text: "Simplify Language" },
-    //     { text: "Be more specific" },
-    //     { text: "Add a smart summary" },
-    // ]
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null)
+    const userPromptInputRef = useRef<HTMLInputElement>(null)
+    const [selectedAIAction, setSelectedAIAction] = useState<string>("");
+    const [selectedAIActionIndex, setSelectedAIActionIndex] = useState<number>(0);
+    const [userPromptInput, setUserPromptInput] = useState<string>("");
 
 
     const moveSlide = (fromIndex: number, toIndex: number) => {
@@ -132,12 +128,76 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
             }
             return {
                 ...slide,
-
                 thumbnail: image.thumbnail
             };
         });
     }, [slidesState, imagesArray]);
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (userPromptInputRef.current && userPromptInputRef.current.contains(event.target as Node)) {
+                return;
+            }
+
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setOpenIndex(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [dropdownRef]);
+
+    const handleToggle = (index: number) => {
+        // If you click the same one, close it. Otherwise, set it to the clicked index
+        setOpenIndex(openIndex === index ? null : index);
+    };
+
+    const passSingleSlideParamenters = async (index: number, prompt: { text: string }) => {
+        console.log(prompt, index, 'trued')
+        setSelectedAIAction(prompt.text)
+        setSelectedAIActionIndex(index);
+    }
+
+
+    useEffect(() => {
+        console.log(slideStates, 'here')
+        console.log(selectedAIActionIndex, 'here')
+        console.log(slideStates[selectedAIActionIndex], 'here')
+        const updateSingleSlide = async () => {
+            const payload = RefineSingleSlideInstructions({
+                slideToUpdate: slideStates[selectedAIActionIndex],
+                user_prompt: selectedAIAction || userPromptInput,
+            })
+
+            const passedValue = {
+                files: payload.files,
+                user_prompt: payload.user_prompt,
+                username: payload.username,
+                password: payload.password,
+                temperature: payload.temperature
+            }
+
+            try {
+                const updatedSlide = await EnterPromptSlide(passedValue) as OpenAIResponse
+                const result = extractOpenAIResponseContent(updatedSlide)
+                console.log(result)
+                const updatedSlides = [...slidesState];
+                updatedSlides[selectedAIActionIndex] = result.slide;
+                // setSlides(updatedSlides);
+                setSlideState(updatedSlides)
+                setOpenIndex(null)
+                setUserPromptInput("")
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        if (selectedAIAction) {
+            updateSingleSlide()
+        }
+    }, [selectedAIAction, selectedAIActionIndex])
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -177,8 +237,8 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                         (slideStates.length > 0 ? slideStates : slidesState).map((slide, index) => (
                             <div key={index}>
                                 {slide.templateSlide === 'TitleSlide' ? (
-                                    <div className="relative group">
-                                        {/* <DropdownMenu open={titleOpen}>
+                                    <div className="relative group" ref={dropdownRef}>
+                                        <DropdownMenu open={openIndex === index}>
                                             <DropdownMenuTrigger>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
@@ -189,23 +249,28 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                                     </div>
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
-                                                <Input placeholder="Ask AI to..." />
-                                                {editWithAIOptions.map((i, index) => <DropdownMenuItem key={index} className="text-lg font-[300] cursor-pointer" onClick={() => setTitleOpen(false)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
+                                                <div className="relative">
+                                                    <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
+                                                    <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                                        <PaperPlaneIcon />
+                                                    </Button>
+                                                </div>
+                                                {editWithAIOptions.map((i, indexx) => <DropdownMenuItem key={indexx} className="text-lg font-[300] cursor-pointer" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="absolute  hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
-                                            <div className="flex gap-2" onClick={() => setTitleOpen(!titleOpen)}>
+                                            <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
                                                 <SparklesIcon className="w-4 h-4 text-primary" />
                                                 <ChevronDown className="w-4 h-4 text-gray-500" />
                                             </div>
-                                        </div> */}
+                                        </div>
                                         <div key={index} className="shadow-[0_16px_36px_#542fb814]">
                                             <TitlePage mode={type} content={slide} />
                                         </div>
                                     </div>
                                 ) : slide.templateSlide === 'SectionHeader' ? (
-                                    <div className="relative group">
-                                        {/* <DropdownMenu open={sectionHeaderOpen}>
+                                    <div className="relative group" ref={dropdownRef}>
+                                        <DropdownMenu open={openIndex === index}>
                                             <DropdownMenuTrigger>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
@@ -216,23 +281,28 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                                     </div>
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
-                                                <Input placeholder="Ask AI to..." />
-                                                {editWithAIOptions.map((i, index) => <DropdownMenuItem key={index} className="text-lg font-[300] cursor-pointer" onClick={() => setsectionHeaderOpen(false)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
+                                                <div className="relative">
+                                                    <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
+                                                    <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                                        <PaperPlaneIcon />
+                                                    </Button>
+                                                </div>
+                                                {editWithAIOptions.map((i, index) => <DropdownMenuItem key={index} className="text-lg font-[300] cursor-pointer" onClick={() => setOpenIndex(null)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
-                                            <div className="flex gap-2" onClick={() => setsectionHeaderOpen(!sectionHeaderOpen)}>
+                                            <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
                                                 <SparklesIcon className="w-4 h-4 text-primary" />
                                                 <ChevronDown className="w-4 h-4 text-gray-500" />
                                             </div>
-                                        </div> */}
+                                        </div>
                                         <div key={index} className="shadow-[0_16px_36px_#542fb814]">
                                             <SectionHeader mode={type} content={slide} />
                                         </div>
                                     </div>
                                 ) : slide.templateSlide === 'BulletList' ? (
-                                    <div className="relative group">
-                                        {/* <DropdownMenu open={bulletListOpen}>
+                                    <div className="relative group" ref={dropdownRef}>
+                                        <DropdownMenu open={openIndex === index}>
                                             <DropdownMenuTrigger>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
@@ -243,23 +313,28 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                                     </div>
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
-                                                <Input placeholder="Ask AI to..." />
-                                                {editWithAIOptions.map((i, index) => <DropdownMenuItem key={index} className="text-lg font-[300] cursor-pointer" onClick={() => setbulletListOpen(false)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
+                                                <div className="relative">
+                                                    <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
+                                                    <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                                        <PaperPlaneIcon />
+                                                    </Button>
+                                                </div>
+                                                {editWithAIOptions.map((i, index) => <DropdownMenuItem key={index} className="text-lg font-[300] cursor-pointer" onClick={() => setOpenIndex(null)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
-                                            <div className="flex gap-2" onClick={() => setbulletListOpen(!bulletListOpen)}>
+                                            <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
                                                 <SparklesIcon className="w-4 h-4 text-primary" />
                                                 <ChevronDown className="w-4 h-4 text-gray-500" />
                                             </div>
-                                        </div> */}
+                                        </div>
                                         <div key={index} className="shadow-[0_16px_36px_#542fb814]">
                                             <BulletList mode={type} content={slide} />
                                         </div>
                                     </div>
                                 ) : slide.templateSlide === 'ImageWithCaption' ? (
-                                    <div className="relative group">
-                                        {/* <DropdownMenu open={imageWithCaptionOpen}>
+                                    <div className="relative group" ref={dropdownRef}>
+                                        <DropdownMenu open={openIndex === index}>
                                             <DropdownMenuTrigger>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
@@ -270,23 +345,28 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                                     </div>
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
-                                                <Input placeholder="Ask AI to..." />
-                                                {editWithAIOptions.map((i, index) => <DropdownMenuItem key={index} className="text-lg font-[300] cursor-pointer" onClick={() => setimageWithCaptionOpen(false)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
+                                                <div className="relative">
+                                                    <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
+                                                    <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                                        <PaperPlaneIcon />
+                                                    </Button>
+                                                </div>
+                                                {editWithAIOptions.map((i, index) => <DropdownMenuItem key={index} className="text-lg font-[300] cursor-pointer" onClick={() => setOpenIndex(null)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
-                                            <div className="flex gap-2" onClick={() => setimageWithCaptionOpen(!imageWithCaptionOpen)}>
+                                            <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
                                                 <SparklesIcon className="w-4 h-4 text-primary" />
                                                 <ChevronDown className="w-4 h-4 text-gray-500" />
                                             </div>
-                                        </div> */}
+                                        </div>
                                         <div key={index} className="shadow-[0_16px_36px_#542fb814]">
                                             <ImageWithCaption mode={type} content={slide} />
                                         </div>
                                     </div>
                                 ) : slide.templateSlide === 'ClosingSlide' ? (
-                                    <div className="relative group">
-                                        {/* <DropdownMenu open={closingSlideOpen}>
+                                    <div className="relative group" ref={dropdownRef}>
+                                        <DropdownMenu open={openIndex === index}>
                                             <DropdownMenuTrigger>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
@@ -297,16 +377,21 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                                     </div>
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
-                                                <Input placeholder="Ask AI to..." />
-                                                {editWithAIOptions.map((i, index) => <DropdownMenuItem key={index} className="text-lg font-[300] cursor-pointer" onClick={() => setclosingSlideOpen(false)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
+                                                <div className="relative">
+                                                    <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
+                                                    <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                                        <PaperPlaneIcon />
+                                                    </Button>
+                                                </div>
+                                                {editWithAIOptions.map((i, index) => <DropdownMenuItem key={index} className="text-lg font-[300] cursor-pointer" onClick={() => setOpenIndex(null)}><AlignLeft /> &nbsp;{i.text}</DropdownMenuItem>)}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
-                                            <div className="flex gap-2" onClick={() => setclosingSlideOpen(!closingSlideOpen)}>
+                                            <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
                                                 <SparklesIcon className="w-4 h-4 text-primary" />
                                                 <ChevronDown className="w-4 h-4 text-gray-500" />
                                             </div>
-                                        </div> */}
+                                        </div>
                                         <div key={index} className="shadow-[0_16px_36px_#542fb814]">
                                             <ClosingSide mode={type} content={slide} />
                                         </div>
