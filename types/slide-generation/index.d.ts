@@ -14,9 +14,9 @@ export interface SlideDeck {
 
 export interface EnterPromptSlideProps {
     files: any[];
-    user_prompt: string;
-    username: string;
-    password: string;
+    user_prompt: string | undefined;
+    username: string| undefined;
+    password: string| undefined;
     temperature: number | slide;
 }
 
