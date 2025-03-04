@@ -7,6 +7,7 @@ import { green_band, logo_2 } from '@/lib/images';
 import Image from 'next/image';
 import { SectionProps } from '@/app/slide-deck/page';
 import { Slide, SlidesEditorProps } from '@/types/slide-generation';
+import Spinner from '@/components/reusables/Spinner';
 
 const ClosingSide: React.FC<SlidesEditorProps> = ({ mode, content }) => {
     const { setSlideState } = useTheme();
@@ -41,7 +42,14 @@ const ClosingSide: React.FC<SlidesEditorProps> = ({ mode, content }) => {
 
 
     return (
-        <div className={`bg-[url(../assets/img/HPE_theme_assets/image_placeholder_theme_2.jpeg)] bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen' : 'rounded-lg'}`}>
+        <div className={`bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen' : 'rounded-lg'}`} style={{
+            backgroundImage: `url(${content?.thumbnail})`,
+          }}>
+            {!content.thumbnail ? (
+                <div className='w-full flex justify-center py-12'>
+                    <Spinner />
+                </div>
+            ) : (
             <div className='w-2/3'>
                 {mode === 'editing' ? (
                     <Image src={logo_2} width={150} alt='logo' />
@@ -83,6 +91,7 @@ const ClosingSide: React.FC<SlidesEditorProps> = ({ mode, content }) => {
                 )}
                 <Image src={green_band} alt='logo' className='mt-3 w-[50px]' />
             </div>
+            )}
         </div>
     );
 };

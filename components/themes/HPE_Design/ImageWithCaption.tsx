@@ -10,21 +10,21 @@ import Spinner from '@/components/reusables/Spinner';
 
 
 const ImageWithCaption: React.FC<SlidesEditorProps> = ({ mode, content }) => {
-        const { setSlideState } = useTheme();
+    const { setSlideState } = useTheme();
 
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
-       const updatedContent = [...content.content];
-               const findUpdatedContent = updatedContent.findIndex((item, indexx) => indexx === index);
-               if (findUpdatedContent !== -1) {
-                   updatedContent[findUpdatedContent] = event.target.value;
-               }
-       
-               setSlideState((prevState: Slide[]) =>
-                   prevState.map(section =>
-                       section === content ? { ...section, content: updatedContent } : section
-                   )
-               );
+        const updatedContent = [...content.content];
+        const findUpdatedContent = updatedContent.findIndex((item, indexx) => indexx === index);
+        if (findUpdatedContent !== -1) {
+            updatedContent[findUpdatedContent] = event.target.value;
+        }
+
+        setSlideState((prevState: Slide[]) =>
+            prevState.map(section =>
+                section === content ? { ...section, content: updatedContent } : section
+            )
+        );
     };
 
 
@@ -39,9 +39,11 @@ const ImageWithCaption: React.FC<SlidesEditorProps> = ({ mode, content }) => {
                 <div className='mt-7'>
                     {
                         content.thumbnail ? (
-                            <Image src={content.thumbnail} alt='logo' className='w-full h-[350px] mt-1 object-cover' width={200} height={200}/>
+                            <Image src={content.thumbnail} alt='logo' className='w-full h-[350px] mt-1 object-cover' width={200} height={200} />
                         ) : (
-                            <Spinner />
+                            <div className='w-full flex justify-center py-12'>
+                                <Spinner />
+                            </div>
                         )
                     }
                 </div>

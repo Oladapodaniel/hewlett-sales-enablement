@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { green_band, logo_2 } from '@/lib/images';
 import Image from 'next/image';
 import { Slide, SlidesEditorProps } from '@/types/slide-generation';
+import Spinner from '@/components/reusables/Spinner';
 
 
 const TitlePage: React.FC<SlidesEditorProps> = ({ mode, content }) => {
@@ -55,9 +56,14 @@ const TitlePage: React.FC<SlidesEditorProps> = ({ mode, content }) => {
 
 
     return (
-        <div className={` bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen ' : 'rounded-lg'}`}  style={{
+        <div className={` bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen ' : 'rounded-lg'}`} style={{
             backgroundImage: `url(${content?.thumbnail})`,
           }}>
+            {!content.thumbnail ? (
+                <div className='w-full flex justify-center py-12'>
+                <Spinner />
+            </div>
+            ) : (
             <div className='w-2/3'>
                 {mode === 'editing' ? (
                     // <textarea value={'LOGO'} onChange={handleChange} className='caret-white text-4xl font-medium text-white bg-transparent' />
@@ -111,6 +117,7 @@ const TitlePage: React.FC<SlidesEditorProps> = ({ mode, content }) => {
                     // <div className='mt-5 text-white text-4xl'>{selectedTheme?.slides[0]?.footer?.text}</div>
                 )}
             </div>
+            )}
         </div>
     );
 };

@@ -57,3 +57,12 @@ declare type PollImageProps = {
         sample: string;
     }
 }
+
+declare type imageGenerationPromptProps = {
+    title: string,
+    content: string
+}
+
+declare type SlideTypeProps = {
+    type: 'TitleSlide' | 'ImageWithCaption' | 'SectionHeader' | 'ClosingSlide' | null
+}

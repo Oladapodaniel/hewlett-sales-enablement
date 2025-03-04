@@ -196,7 +196,7 @@ const GenerateProposalPage: React.FC = () => {
                                             <div className='bg-secondary px-4 py-1 rounded-full'>{slideStates.length} Slides</div>
                                         </div>
                                         <div>
-                                            <Button onClick={() =>router.push("/slide-deck")} className="rounded-full text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">Generate Presentation
+                                            <Button onClick={() =>router.push("/slide-deck")} className="rounded-lg text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">Generate Presentation
                                                 <ArrowRightIcon className="w-6 h-5" />
                                             </Button>
                                         </div>

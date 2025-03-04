@@ -1,4 +1,4 @@
-import { EnterPromptInstructionsProps, RefineSingleSlideInstructionsProps } from "@/types/slide-generation";
+import { EnterPromptInstructionsProps, imageGenerationPromptProps, RefineSingleSlideInstructionsProps } from "@/types/slide-generation";
 
 export const EnterPromptInstructions = ({ user_prompt, pages, tone, output_language, audience }: EnterPromptInstructionsProps) => {
   return {
@@ -123,3 +123,10 @@ export const RefineSingleSlideInstructions = ({ slideToUpdate, user_prompt }: Re
     temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE || 0.1
   };
 };
+
+export const imageGenerationPrompt = ({ title, content }: imageGenerationPromptProps) => (
+  `Generate a high-quality, dark green themed image inspired by "${title}" and "${content}". 
+The image should be purely visual with absolutely no text, letters, numbers, or typographic marks. 
+Focus on abstract or symbolic representation, using dark and green shades.
+`
+)

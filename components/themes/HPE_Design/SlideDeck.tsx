@@ -10,7 +10,7 @@ import ImageWithCaption from "./ImageWithCaption";
 import ClosingSide from "./ClosingSlide";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { AlignLeft, ChevronDown, CircleMinus, CirclePlus, Download, Play, SparklesIcon } from "lucide-react";
+import { AlignLeft, ChevronDown, CircleMinus, CirclePlus, Download, Play, SparklesIcon, Swords, Volume2 } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -33,9 +33,9 @@ import { useTheme } from "@/context/ThemeContext";
 import { thumbnail_fifth, thumbnail_first, thumbnail_fourth, thumbnail_second, thumbnail_third } from "@/lib/images";
 import { Input } from "@/components/ui/input";
 import { editWithAIOptions } from "@/constants/util";
-import { RefineSingleSlideInstructions } from "@/constants/modelInstructions";
+import { imageGenerationPrompt, RefineSingleSlideInstructions } from "@/constants/modelInstructions";
 import { EnterPromptSlide } from "@/lib/actions/slide-generation/enter-prompt-slide";
-import { EnterPromptSlideProps, PollImageProps, SlideDeckProps } from "@/types/slide-generation";
+import { EnterPromptSlideProps, PollImageProps, SlideDeckProps, SlideTypeProps } from "@/types/slide-generation";
 import { extractOpenAIResponseContent, OpenAIResponse } from "@/lib/utils";
 import Spinner from "@/components/reusables/Spinner";
 import { GenerateImage, PollingImage } from "@/lib/actions/image-generation/generate-image";
@@ -343,57 +343,124 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
   };
 
   // 2) Generate images for each relevant slide and update thumbnail after polling is complete
-  const generateImagesForSlides = async () => {
-    console.log('generation')
-    // Filter slides that need an image
-    const slidesToGenerateImages = slidesState.filter(
-      (slide) =>
-        slide.templateSlide === 'TitleSlide' ||
-        slide.templateSlide === 'ImageWithCaption' ||
-        slide.templateSlide === 'SectionHeader'
-    );
+  
+//   const generateImagesForSlides = async (type: SlideTypeProps['type']) => {
+//     console.log('generation')
 
-    // We'll store a local, mutable copy and update it as we go
-    const updatedSlides = [...slidesState];
+//     const slidesToGenerateImages = type
+//       ? slidesState.filter((slide) => slide.templateSlide === type)
+//       : slidesState.filter(
+//           (slide) =>
+//             slide.templateSlide === 'TitleSlide' ||
+//             slide.templateSlide === 'ImageWithCaption' ||
+//             slide.templateSlide === 'SectionHeader' ||
+//             slide.templateSlide === 'ClosingSlide'
+//         );
+//     // Filter slides that need an image
+//     // const slidesToGenerateImages = slidesState.filter(
+//     //   (slide) =>
+//     //     slide.templateSlide === 'TitleSlide' ||
+//     //     slide.templateSlide === 'ImageWithCaption' ||
+//     //     slide.templateSlide === 'SectionHeader' ||
+//     //     slide.templateSlide === 'ClosingSlide'
+//     // );
 
+//     // We'll store a local, mutable copy and update it as we go
+//     const updatedSlides = [...slidesState];
+
+//     for (const slide of slidesToGenerateImages) {
+//       const payload = {
+//         prompt: imageGenerationPrompt({ title: slide.title, content: slide.content[0] }),
+//         processor: 'bfl',
+//         height: 1024,
+//         width: 1024,
+//       };
+
+//       try {
+//         // 1) Request a new image generation
+//         const response = (await GenerateImage(payload)) as { polling_url: string };
+//         // 2) Poll until the image is ready
+//         const imageUrl = await pollGeneratedImage(response.polling_url);
+
+//         if (imageUrl) {
+//             console.log(imageUrl, 'valid image gitten')
+//           // 3) If we got a valid image URL, update the slide's thumbnail
+//           const idx = updatedSlides.findIndex((s) => s.id === slide.id);
+//           if (idx !== -1) {
+//             updatedSlides[idx] = {
+//               ...updatedSlides[idx],
+//               thumbnail: imageUrl,
+//             };
+//           }
+//           // 4) Update state so UI re-renders with the new thumbnail
+//           setSlideState([...updatedSlides]);
+//         }
+//       } catch (error) {
+//         console.error('Error generating image for slide:', error);
+//       }
+//     }
+//   };
+
+const generateImagesForSlides = async (type: SlideTypeProps["type"]) => {
+    console.log("generation");
+    
+    // If 'type' is defined, only find slides of that template type
+    // Otherwise, find all that match the default set (TitleSlide, etc.)
+    const slidesToGenerateImages = type
+      ? slidesState.filter((slide) => slide.templateSlide === type)
+      : slidesState.filter(
+          (slide) =>
+            slide.templateSlide === "TitleSlide" ||
+            slide.templateSlide === "ImageWithCaption" ||
+            slide.templateSlide === "SectionHeader" ||
+            slide.templateSlide === "ClosingSlide"
+        );
+  
     for (const slide of slidesToGenerateImages) {
       const payload = {
-        prompt: `Generate a unique dark theme image for the slide titled "${slide.title}" with the content: "${slide.content}" without any text in it`,
-        // prompt: `Generate an image for ${slide.templateSlide}`,
-        processor: 'bfl',
+        prompt: imageGenerationPrompt({ title: slide.title, content: slide.content[0] }),
+        processor: "bfl",
         height: 1024,
         width: 1024,
       };
-
+  
       try {
         // 1) Request a new image generation
         const response = (await GenerateImage(payload)) as { polling_url: string };
         // 2) Poll until the image is ready
         const imageUrl = await pollGeneratedImage(response.polling_url);
-
+  
         if (imageUrl) {
-            console.log(imageUrl, 'valid image gitten')
-          // 3) If we got a valid image URL, update the slide's thumbnail
-          const idx = updatedSlides.findIndex((s) => s.id === slide.id);
-          if (idx !== -1) {
-            updatedSlides[idx] = {
-              ...updatedSlides[idx],
-              thumbnail: imageUrl,
-            };
-          }
-          // 4) Update state so UI re-renders with the new thumbnail
-          setSlideState([...updatedSlides]);
+          console.log(imageUrl, "valid image retrieved");
+  
+          // 3) Update the single slide's thumbnail in state
+          setSlideState((prevSlides) => {
+            // Make a copy of the previous slides
+            const updatedSlides = [...prevSlides];
+            // Find the target slide
+            const idx = updatedSlides.findIndex((s) => s.id === slide.id);
+            // If found, update only that slide's thumbnail
+            if (idx !== -1) {
+              updatedSlides[idx] = {
+                ...updatedSlides[idx],
+                thumbnail: imageUrl,
+              };
+            }
+            // Return new array to trigger re-render
+            return updatedSlides;
+          });
         }
       } catch (error) {
-        console.error('Error generating image for slide:', error);
+        console.error("Error generating image for slide:", error);
       }
     }
   };
 
+
   // 3) Kick off the generation on mount
   useEffect(() => {
     if (!slidesState.some(i => i.thumbnail)) {
-        generateImagesForSlides();
+        generateImagesForSlides(null);
     }
   }, []);
 
@@ -401,12 +468,17 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
 
     return (
         <DndProvider backend={HTML5Backend}>
-
             <div className="flex gap-4 justify-end p-4">
-                <Button onClick={() => router.push("/present")} variant={'secondary'} className="rounded-full text-lg bg-secondary text-black shadow-lg" type="submit">
+                <Button onClick={() => router.push("/present")} variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
+                <Swords /> Challenge me
+                </Button>
+                <Button onClick={() => router.push("/present")} variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
+                <Volume2 /> Present it to me
+                </Button>
+                <Button onClick={() => router.push("/present")} variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
                     <Download /> Download
                 </Button>
-                <Button onClick={() => router.push("/present")} className="rounded-full text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">
+                <Button onClick={() => router.push("/present")} className="rounded-lg text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">
                     <Play /> Present
                 </Button>
             </div>
@@ -457,6 +529,9 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                                     </Button>
                                                 </div>
                                                 {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
+                                                <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
+                                                    generateImagesForSlides('TitleSlide')
+                                                }}><AlignLeft /> &nbsp;Regenerate Image</div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="absolute  hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
@@ -493,6 +568,9 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                                     </Button>
                                                 </div>
                                                 {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
+                                                <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
+                                                    generateImagesForSlides('SectionHeader')
+                                                }}><AlignLeft /> &nbsp;Regenerate Image</div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
@@ -565,6 +643,9 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                                     </Button>
                                                 </div>
                                                 {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
+                                                <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
+                                                    generateImagesForSlides('ImageWithCaption')
+                                                }}><AlignLeft /> &nbsp;Regenerate Image</div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
@@ -601,6 +682,9 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                                     </Button>
                                                 </div>
                                                 {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
+                                                <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
+                                                    generateImagesForSlides('ClosingSlide')
+                                                }}><AlignLeft /> &nbsp;Regenerate Image</div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
