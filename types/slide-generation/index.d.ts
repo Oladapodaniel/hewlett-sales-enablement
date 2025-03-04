@@ -66,3 +66,14 @@ declare type imageGenerationPromptProps = {
 declare type SlideTypeProps = {
     type: 'TitleSlide' | 'ImageWithCaption' | 'SectionHeader' | 'ClosingSlide' | null
 }
+
+declare type contentThemesProps = {
+    name: string;
+    description: string;
+    selected: string;
+}
+
+declare type ModifySlideByThemeProps = {
+    slides: Slide[];
+    theme: contentThemesProps
+}

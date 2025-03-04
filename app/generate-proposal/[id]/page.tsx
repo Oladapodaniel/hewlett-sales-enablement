@@ -21,7 +21,10 @@ import DraggableSection from '@/components/reusables/DragAndDropCards';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
 import { SectionProps } from '@/app/slide-deck/page';
-import { Slide } from '@/types/slide-generation';
+import { contentThemesProps, Slide } from '@/types/slide-generation';
+import { ModifySlideByTheme } from '@/constants/modelInstructions';
+import { extractOpenAIResponseContent, OpenAIResponse } from '@/lib/utils';
+import { EnterPromptSlide } from '@/lib/actions/slide-generation/enter-prompt-slide';
 
 const GenerateProposalPage: React.FC = () => {
     const router = useRouter();
@@ -30,7 +33,7 @@ const GenerateProposalPage: React.FC = () => {
     const { slideStates, setSlideState } = useTheme();
     // const [sections, setSections] = useState([...slideStates])
 
-    const contentThemes = [
+    const contentThemes: contentThemesProps[] = [
         {
             name: "Superficial (High-level overview)",
             description: "Quick, broad summary for executives.",
@@ -86,10 +89,6 @@ const GenerateProposalPage: React.FC = () => {
         setSlideState(order)
     };
 
-    useEffect(() => {
-        console.log(slideStates, 'here')
-    })
-
 
     const headerRight = () => (
         <div className='flex items-center gap-3'>
@@ -114,6 +113,40 @@ const GenerateProposalPage: React.FC = () => {
         hidden: { opacity: 0, x: 30 },
         visible: { opacity: 1, x: 0 }
     };
+
+    const updatePresentationTheme = async (theme: contentThemesProps) => {
+        setSelectedTheme(theme.selected)
+        console.log(theme, 'theme here')
+        setLoading(true);
+        
+        const promptParameters = {
+            slides: slideStates,
+            theme
+        }
+        
+        const payload = ModifySlideByTheme(promptParameters)
+        
+        const passedValue = {
+            files: payload.files,
+            user_prompt: payload.user_prompt,
+            username: payload.username,
+            password: payload.password,
+            temperature: payload.temperature
+        }
+        try {
+            
+            const result = await EnterPromptSlide(passedValue) as OpenAIResponse;
+            setLoading(false);
+                    
+                    const generatedSlideContent = extractOpenAIResponseContent(result);
+                    console.log(generatedSlideContent, 'with new theme')
+                    setSlideState(generatedSlideContent.slides)
+                } catch (error) {
+                    setLoading(false);
+                    console.error(error)
+                }
+
+    }
 
     useEffect(() => {
         setTimeout(() => {
@@ -163,7 +196,7 @@ const GenerateProposalPage: React.FC = () => {
                                                         viewport={{ once: true }}
                                                         className='col-span-2 lg:col-span-1'
                                                     >
-                                                        <Card className={`${theme.selected === selectedTheme ? "border border-primary" : ""}`}>
+                                                        <Card className={`${theme.selected === selectedTheme ? "border border-primary" : ""} cursor-pointer`} onClick={() => updatePresentationTheme(theme)}>
                                                             <CardHeader>
                                                                 <CardTitle>{theme.name}</CardTitle>
                                                                 <CardDescription>{theme.description}</CardDescription>
