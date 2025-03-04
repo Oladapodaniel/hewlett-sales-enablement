@@ -5,21 +5,17 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { green_band, logo_2 } from '@/lib/images';
 import Image from 'next/image';
-import { SectionProps } from '@/app/slide-deck/page';
+import { Slide, SlidesEditorProps } from '@/types/slide-generation';
 
-interface SectionHeaderProps {
-    mode: 'editing' | 'presenting';
-    content: SectionProps
-}
 
-const SectionHeader: React.FC<SectionHeaderProps> = ({ mode, content }) => {
+const SectionHeader: React.FC<SlidesEditorProps> = ({ mode, content }) => {
     const { setSlideState } = useTheme();
 
 
 
     const handleTitle = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newTitleText = event.target.value;
-        setSlideState((prevState: SectionProps[]) => {
+        setSlideState((prevState: Slide[]) => {
             const updatedState = [...prevState];
             const findSlideIndex = updatedState.findIndex(i => i.id === content.id);
             updatedState[findSlideIndex] = {
@@ -32,7 +28,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ mode, content }) => {
 
     const handleBody = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newBodyText = event.target.value;
-        setSlideState((prevState: SectionProps[]) => {
+        setSlideState((prevState: Slide[]) => {
             const updatedState = [...prevState];
             const findSlideIndex = updatedState.findIndex(i => i.id === content.id);
             updatedState[findSlideIndex] = {

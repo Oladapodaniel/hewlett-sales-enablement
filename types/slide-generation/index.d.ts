@@ -12,6 +12,16 @@ export interface SlideDeck {
     slides: Slide[];
 }
 
+declare type SlideDeckProps = {
+    type: 'editing' | 'presenting';
+    slides: Slide[];
+}
+
+export interface SlidesEditorProps {
+    mode: 'editing' | 'presenting';
+    content: Slide
+}
+
 export interface EnterPromptSlideProps {
     files: any[];
     user_prompt: string | undefined;
@@ -29,6 +39,21 @@ declare type EnterPromptInstructionsProps = {
 }
 
 declare type RefineSingleSlideInstructionsProps = {
-    slideToUpdate: SectionProps, 
+    slideToUpdate: Slide, 
     user_prompt: string
+}
+
+declare type GenerateImageProps = {
+    prompt: string;
+    processor: string;
+    height: number;
+    width: number;
+}
+
+declare type PollImageProps = {
+    polling_url: string
+    status?: string;
+    result?: {
+        sample: string;
+    }
 }

@@ -5,21 +5,17 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { green_band, logo_2 } from '@/lib/images';
 import Image from 'next/image';
-import { SectionProps } from '@/app/slide-deck/page';
+import { Slide, SlidesEditorProps } from '@/types/slide-generation';
 
-interface TitlePageProps {
-    mode: 'editing' | 'presenting';
-    content: SectionProps
-}
 
-const TitlePage: React.FC<TitlePageProps> = ({ mode, content }) => {
+const TitlePage: React.FC<SlidesEditorProps> = ({ mode, content }) => {
     const { setSlideState } = useTheme();
 
 
     const handleTitle = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newTitleText = event.target.value;
 
-        setSlideState((prevState: SectionProps[]) => {
+        setSlideState((prevState: Slide[]) => {
             const updatedState = [...prevState];
             const findSlideIndex = updatedState.findIndex(i => i.id === content.id);
             updatedState[findSlideIndex] = {
@@ -32,7 +28,7 @@ const TitlePage: React.FC<TitlePageProps> = ({ mode, content }) => {
 
     const handleBody = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newBodyText = event.target.value;
-        setSlideState((prevState: SectionProps[]) => {
+        setSlideState((prevState: Slide[]) => {
             const updatedState = [...prevState];
             const findSlideIndex = updatedState.findIndex(i => i.id === content.id);
             updatedState[findSlideIndex] = {
@@ -46,7 +42,7 @@ const TitlePage: React.FC<TitlePageProps> = ({ mode, content }) => {
 
     const handleFooter = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newFooterText = event.target.value;
-        setSlideState((prevState: SectionProps[]) => {
+        setSlideState((prevState: Slide[]) => {
             const updatedState = [...prevState];
             const findSlideIndex = updatedState.findIndex(i => i.id === content.id);
             updatedState[findSlideIndex] = {
@@ -59,7 +55,9 @@ const TitlePage: React.FC<TitlePageProps> = ({ mode, content }) => {
 
 
     return (
-        <div className={`bg-[url(../assets/img/HPE_theme_assets/start_deck_bg.png)] bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen ' : 'rounded-lg'}`}>
+        <div className={` bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen ' : 'rounded-lg'}`}  style={{
+            backgroundImage: `url(${content?.thumbnail})`,
+          }}>
             <div className='w-2/3'>
                 {mode === 'editing' ? (
                     // <textarea value={'LOGO'} onChange={handleChange} className='caret-white text-4xl font-medium text-white bg-transparent' />

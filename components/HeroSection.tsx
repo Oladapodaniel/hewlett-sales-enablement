@@ -33,6 +33,7 @@ import { EnterPromptSlide } from '@/lib/actions/slide-generation/enter-prompt-sl
 import { EnterPromptInstructions } from '@/constants/modelInstructions'
 import { useTheme } from '@/context/ThemeContext'
 import { extractOpenAIResponseContent, OpenAIResponse } from '@/lib/utils'
+import { Slide } from '@/types/slide-generation'
 
 
 
@@ -74,14 +75,22 @@ const HeroSection = () => {
         }
 
         const payload = EnterPromptInstructions(promptParameters)
+
+        const passedValue = {
+            files: payload.files,
+            user_prompt: payload.user_prompt,
+            username: payload.username,
+            password: payload.password,
+            temperature: payload.temperature
+        }
         try {
 
-            const result = await EnterPromptSlide(payload) as OpenAIResponse;
+            const result = await EnterPromptSlide(passedValue) as OpenAIResponse;
             setLoading(false);
             
             const generatedSlideContent = extractOpenAIResponseContent(result);
             console.log(generatedSlideContent)
-            setSlideState(generatedSlideContent.slides)
+            setSlideState(generatedSlideContent.slides.map((i: Slide) => ({ ...i, thumbnail: "" })))
             router.push('/refine-request-topic')
         } catch (error) {
             setLoading(false);

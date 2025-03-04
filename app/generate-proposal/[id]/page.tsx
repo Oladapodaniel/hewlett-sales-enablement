@@ -21,6 +21,7 @@ import DraggableSection from '@/components/reusables/DragAndDropCards';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
 import { SectionProps } from '@/app/slide-deck/page';
+import { Slide } from '@/types/slide-generation';
 
 const GenerateProposalPage: React.FC = () => {
     const router = useRouter();
@@ -66,7 +67,7 @@ const GenerateProposalPage: React.FC = () => {
     //     content: string[];
     // }
 
-    function reorder(list: SectionProps[], startIndex: number, endIndex: number): SectionProps[] {
+    function reorder(list: Slide[], startIndex: number, endIndex: number): Slide[] {
         const result = [...list];
         const [removed] = result.splice(startIndex, 1);
         result.splice(endIndex, 0, removed);
@@ -81,7 +82,7 @@ const GenerateProposalPage: React.FC = () => {
 
     const moveSection = (dragIndex: number, hoverIndex: number) => {
         // setSections((prev) => reorder(prev, dragIndex, hoverIndex));
-        const order: SectionProps[] = reorder(slideStates, dragIndex, hoverIndex);
+        const order: Slide[] = reorder(slideStates, dragIndex, hoverIndex);
         setSlideState(order)
     };
 

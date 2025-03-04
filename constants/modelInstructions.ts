@@ -75,7 +75,7 @@ export const RefineSingleSlideInstructions = ({ slideToUpdate, user_prompt }: Re
         },
         {
           role: "system",
-          content: "IMPORTANT: Your response must strictly follow the JSON schema provided below, no additional data outside the JSON. If no slide content can be generated, return an object with an empty 'slide' property. Do not wrap your JSON response in triple backticks, do not use Markdown formatting. Return only valid JSON."
+          content: "IMPORTANT: Your response must strictly follow the JSON schema provided below, no additional data outside the JSON. If no slide content can be generated, return an object with an empty 'slide' property. Do not wrap your JSON response in triple backticks, do not use Markdown formatting. Return only valid JSON. Let the thumbnail property in the return JSON be set to empty string"
         }
       ],
       json_schema: {
@@ -109,7 +109,7 @@ export const RefineSingleSlideInstructions = ({ slideToUpdate, user_prompt }: Re
               },
               thumbnail: {
                 type: "string",
-                description: "A URL or identifier for the thumbnail image."
+                description: "A URL or identifier for the thumbnail image. Should be initially return an empty string"
               }
             },
             required: ["title", "id", "templateSlide", "content", "thumbnail"]

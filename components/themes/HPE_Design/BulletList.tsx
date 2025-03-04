@@ -5,20 +5,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { box_green_band, green_band } from '@/lib/images';
 import Image from 'next/image';
-import { SectionProps } from '@/app/slide-deck/page';
+import { Slide, SlidesEditorProps } from '@/types/slide-generation';
 
-interface BulletListProps {
-    mode: 'editing' | 'presenting';
-    content: SectionProps
-}
 
-const BulletList: React.FC<BulletListProps> = ({ mode, content }) => {
+const BulletList: React.FC<SlidesEditorProps> = ({ mode, content }) => {
     const { setSlideState } = useTheme();
 
     const handleTitle = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const updatedTitle = event.target.value;
 
-        setSlideState((prevState: SectionProps[]) =>
+        setSlideState((prevState: Slide[]) =>
             prevState.map(section =>
             section === content ? { ...section, title: updatedTitle } : section
             )
@@ -33,7 +29,7 @@ const BulletList: React.FC<BulletListProps> = ({ mode, content }) => {
             updatedContent[findUpdatedContent] = event.target.value;
         }
 
-        setSlideState((prevState: SectionProps[]) =>
+        setSlideState((prevState: Slide[]) =>
             prevState.map(section =>
                 section === content ? { ...section, content: updatedContent } : section
             )

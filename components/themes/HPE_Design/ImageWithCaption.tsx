@@ -5,14 +5,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { box_green_band, green_band, image_placeholder_theme } from '@/lib/images';
 import Image from 'next/image';
-import { SectionProps } from '@/app/slide-deck/page';
+import { Slide, SlidesEditorProps } from '@/types/slide-generation';
+import Spinner from '@/components/reusables/Spinner';
 
-interface ImageWithCaptionProps {
-    mode: 'editing' | 'presenting';
-    content: SectionProps
-}
 
-const ImageWithCaption: React.FC<ImageWithCaptionProps> = ({ mode, content }) => {
+const ImageWithCaption: React.FC<SlidesEditorProps> = ({ mode, content }) => {
         const { setSlideState } = useTheme();
 
 
@@ -23,7 +20,7 @@ const ImageWithCaption: React.FC<ImageWithCaptionProps> = ({ mode, content }) =>
                    updatedContent[findUpdatedContent] = event.target.value;
                }
        
-               setSlideState((prevState: SectionProps[]) =>
+               setSlideState((prevState: Slide[]) =>
                    prevState.map(section =>
                        section === content ? { ...section, content: updatedContent } : section
                    )
@@ -40,7 +37,13 @@ const ImageWithCaption: React.FC<ImageWithCaptionProps> = ({ mode, content }) =>
                     <Image src={green_band} alt='logo' className='w-[50px] mt-1' />
                 </div>
                 <div className='mt-7'>
-                    <Image src={image_placeholder_theme} alt='logo' className='w-full h-[350px] mt-1 object-cover' />
+                    {
+                        content.thumbnail ? (
+                            <Image src={content.thumbnail} alt='logo' className='w-full h-[350px] mt-1 object-cover' width={200} height={200}/>
+                        ) : (
+                            <Spinner />
+                        )
+                    }
                 </div>
                 <div className='mt-7 w-2/3'>
                     {mode === 'editing' ? (

@@ -1,8 +1,8 @@
 "use client";
 
-import { SectionProps } from "@/app/slide-deck/page";
 import { ThemesInterface } from "@/constants/placeholder";
-import { createContext, useEffect, useState, useContext, ReactNode, Dispatch, SetStateAction } from "react";
+import { Slide } from "@/types/slide-generation";
+import { createContext, useState, useContext, ReactNode, Dispatch, SetStateAction } from "react";
 
 // Theme Context for managing theme selection and content
 
@@ -14,8 +14,8 @@ interface ThemeContextType {
     setContent: Dispatch<SetStateAction<object[]>>;
 
     // In Use
-    slideStates: SectionProps[],
-    setSlideState: Dispatch<SetStateAction<SectionProps[]>>;
+    slideStates: Slide[],
+    setSlideState: Dispatch<SetStateAction<Slide[]>>;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
@@ -35,7 +35,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     
   const [selectedTheme, setSelectedTheme] = useState<ThemesInterface | null>(null);
   const [content, setContent] = useState<object[]>([]);
-  const [slideStates, setSlideState] = useState<SectionProps[]>([]);
+  const [slideStates, setSlideState] = useState<Slide[]>([]);
 
   return (
     <ThemeContext.Provider value={{ selectedTheme, setSelectedTheme, content, setContent, slideStates, setSlideState }}>
