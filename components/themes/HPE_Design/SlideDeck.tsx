@@ -35,10 +35,15 @@ import { Input } from "@/components/ui/input";
 import { editWithAIOptions } from "@/constants/util";
 import { imageGenerationPrompt, RefineSingleSlideInstructions } from "@/constants/modelInstructions";
 import { EnterPromptSlide } from "@/lib/actions/slide-generation/enter-prompt-slide";
-import { EnterPromptSlideProps, PollImageProps, SlideDeckProps, SlideTypeProps } from "@/types/slide-generation";
+import { EnterPromptSlideProps, PollImageProps, Slide, SlideDeckProps, SlideTypeProps } from "@/types/slide-generation";
 import { extractOpenAIResponseContent, OpenAIResponse } from "@/lib/utils";
 import Spinner from "@/components/reusables/Spinner";
 import { GenerateImage, PollingImage } from "@/lib/actions/image-generation/generate-image";
+import TitleThumbnail from "./thumbnails/TitleThumbnail";
+import BulletThumbnail from "./thumbnails/BulletThumbnail";
+import ImageCaptionThumbnail from "./thumbnails/ImageCaptionThumbnail";
+import SectionHeaderThumbnail from "./thumbnails/SectionHeaderThumbnail";
+import ClosingThumbnail from "./thumbnails/ClosingThumbnail";
 
 
 
@@ -57,46 +62,54 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
 
 
     const moveSlide = (fromIndex: number, toIndex: number) => {
-        const updatedSlides = [...slidesState];
+        const updatedSlides = [...slideStates];
         const [movedSlide] = updatedSlides.splice(fromIndex, 1);
         updatedSlides.splice(toIndex, 0, movedSlide);
-        setSlides(updatedSlides);
+        // setSlides(updatedSlides);
         setSlideState(slidesState)
     };
 
     const duplicateSlide = (index: number) => {
-        const newSlides = [...slidesState];
+        const newSlides = [...slideStates];
         const slideToDuplicate = newSlides[index];
-        newSlides.splice(index + 1, 0, { ...slideToDuplicate });
-        setSlides(newSlides);
+
+        const allIds = newSlides.map((slide) => slide.id);
+        const maxId = allIds.length > 0 ? Math.max(...allIds) : 0;
+        newSlides.splice(index + 1, 0, {
+            ...slideToDuplicate,
+            id: maxId + 1
+        });
+        // setSlides(newSlides);
+        setSlideState(newSlides)
     }
     const removeSlide = (index: number) => {
-        const updatedSlides = slidesState.filter((_, i) => i !== index);
-        setSlides(updatedSlides);
+        const updatedSlides = slideStates.filter((_, i) => i !== index);
+        // setSlides(updatedSlides);
+        setSlideState(updatedSlides)
     };
 
-    const imagesArray = useMemo(() => [
-        {
-            thumbnail: thumbnail_first,
-            templateSlide: 'TitleSlide'
-        },
-        {
-            thumbnail: thumbnail_second,
-            templateSlide: 'SectionHeader'
-        },
-        {
-            thumbnail: thumbnail_third,
-            templateSlide: 'BulletList'
-        },
-        {
-            thumbnail: thumbnail_fourth,
-            templateSlide: 'ImageWithCaption'
-        },
-        {
-            thumbnail: thumbnail_fifth,
-            templateSlide: 'ClosingSlide'
-        }
-    ], []);
+    // const imagesArray = useMemo(() => [
+    //     {
+    //         thumbnail: thumbnail_first,
+    //         templateSlide: 'TitleSlide'
+    //     },
+    //     {
+    //         thumbnail: thumbnail_second,
+    //         templateSlide: 'SectionHeader'
+    //     },
+    //     {
+    //         thumbnail: thumbnail_third,
+    //         templateSlide: 'BulletList'
+    //     },
+    //     {
+    //         thumbnail: thumbnail_fourth,
+    //         templateSlide: 'ImageWithCaption'
+    //     },
+    //     {
+    //         thumbnail: thumbnail_fifth,
+    //         templateSlide: 'ClosingSlide'
+    //     }
+    // ], []);
     // const imagesArray = [
     //     {
     //         thumbnail: thumbnail_first,
@@ -120,18 +133,18 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     //     }
     // ];
 
-    const slideStateWithThumbnail = useMemo(() => {
-        return slidesState.map(slide => {
-            const image = imagesArray.find(img => img.templateSlide === slide.templateSlide);
-            if (!image) {
-                return
-            }
-            return {
-                ...slide,
-                thumbnail: image.thumbnail
-            };
-        });
-    }, [slidesState, imagesArray]);
+    // const slideStateWithThumbnail = useMemo(() => {
+    //     return slidesState.map(slide => {
+    //         const image = imagesArray.find(img => img.templateSlide === slide.templateSlide);
+    //         if (!image) {
+    //             return
+    //         }
+    //         return {
+    //             ...slide,
+    //             thumbnail: image.thumbnail
+    //         };
+    //     });
+    // }, [slidesState, imagesArray]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -157,6 +170,7 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     };
 
     const passSingleSlideParamenters = async (index: number, prompt: { text: string }) => {
+        console.log(index, 'setting')
         setSelectedAIAction(prompt.text);
         setSelectedAIActionIndex(index);
         setOpenIndex(null);
@@ -186,15 +200,18 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
             try {
                 const updatedSlide = await EnterPromptSlide(passedValue) as OpenAIResponse
                 const result = extractOpenAIResponseContent(updatedSlide)
-                console.log(result)
-                const updatedSlides = [...slidesState];
-                updatedSlides[selectedAIActionIndex] = result.slide;
+                console.log(result, 'result')
+                const updatedSlides = [...slideStates];
+                let updateResult = result.slide
+                updateResult.thumbnail = updatedSlides[selectedAIActionIndex].thumbnail
+                updatedSlides[selectedAIActionIndex] = updateResult;
+                console.log(updateResult, 'updated result')
                 // setSlides(updatedSlides);
                 setSlideState(updatedSlides)
                 setUserPromptInput("")
                 setloadingSlideContent(false);
-                setSelectedAIAction("");
-                setSelectedAIActionIndex(-1);
+                // setSelectedAIAction("");
+                // setSelectedAIActionIndex(-1);
                 setselectedIndex(null);
                 console.log(loadingSlideContent, 'loadingslidecontent')
             } catch (error) {
@@ -293,189 +310,189 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     // }, []);
 
 
-//     import { useEffect, useState } from 'react';
+    //     import { useEffect, useState } from 'react';
 
-// /**
-//  * Example placeholders for your actual GenerateImage and PollingImage calls.
-//  * Adjust these as needed to match your real API signature.
-//  */
-// async function GenerateImage(payload: { prompt: string; processor: string; height: number; width: number }) {
-//   // pretend we return { polling_url: string }
-//   return { polling_url: 'https://api.example.com/poll/12345' };
-// }
-// async function PollingImage(payload: { polling_url: string }) {
-//   // pretend we return { status: boolean; image_url?: string }
-//   // e.g., status = true means done, status = false means still processing
-//   return { status: Math.random() < 0.3, image_url: 'https://cdn.example.com/generated-image.jpg' };
-// }
+    // /**
+    //  * Example placeholders for your actual GenerateImage and PollingImage calls.
+    //  * Adjust these as needed to match your real API signature.
+    //  */
+    // async function GenerateImage(payload: { prompt: string; processor: string; height: number; width: number }) {
+    //   // pretend we return { polling_url: string }
+    //   return { polling_url: 'https://api.example.com/poll/12345' };
+    // }
+    // async function PollingImage(payload: { polling_url: string }) {
+    //   // pretend we return { status: boolean; image_url?: string }
+    //   // e.g., status = true means done, status = false means still processing
+    //   return { status: Math.random() < 0.3, image_url: 'https://cdn.example.com/generated-image.jpg' };
+    // }
 
-// For demonstration
-// interface Slide {
-//   id: number;
-//   templateSlide: string;
-//   thumbnail?: string;
-// }
+    // For demonstration
+    // interface Slide {
+    //   id: number;
+    //   templateSlide: string;
+    //   thumbnail?: string;
+    // }
 
 
-//   const [slidesState, setSlides] = useState<Slide[]>([
-//     { id: 1, templateSlide: 'TitleSlide' },
-//     { id: 2, templateSlide: 'BulletList' },
-//     { id: 3, templateSlide: 'ImageWithCaption' },
-//     { id: 4, templateSlide: 'SectionHeader' },
-//   ]);
+    //   const [slidesState, setSlides] = useState<Slide[]>([
+    //     { id: 1, templateSlide: 'TitleSlide' },
+    //     { id: 2, templateSlide: 'BulletList' },
+    //     { id: 3, templateSlide: 'ImageWithCaption' },
+    //     { id: 4, templateSlide: 'SectionHeader' },
+    //   ]);
 
-  // 1) Polling function: Keep calling the PollingImage endpoint until success (or a timeout).
-  const pollGeneratedImage = async (pollingUrl: string): Promise<string | null> => {
-    // OPTIONAL: Add a maxRetries or timeout to avoid infinite loops
-    while (true) {
-      try {
-        const { status, result} = await PollingImage({ polling_url: pollingUrl }) as PollImageProps;
-        if (status?.toLowerCase() === 'ready') {
-          return result?.sample || null;
-        }
-        // If not ready yet, wait 2 seconds then poll again
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-      } catch (error) {
-        console.error('Error polling image:', error);
-        return null;
-      }
-    }
-  };
-
-  // 2) Generate images for each relevant slide and update thumbnail after polling is complete
-  
-//   const generateImagesForSlides = async (type: SlideTypeProps['type']) => {
-//     console.log('generation')
-
-//     const slidesToGenerateImages = type
-//       ? slidesState.filter((slide) => slide.templateSlide === type)
-//       : slidesState.filter(
-//           (slide) =>
-//             slide.templateSlide === 'TitleSlide' ||
-//             slide.templateSlide === 'ImageWithCaption' ||
-//             slide.templateSlide === 'SectionHeader' ||
-//             slide.templateSlide === 'ClosingSlide'
-//         );
-//     // Filter slides that need an image
-//     // const slidesToGenerateImages = slidesState.filter(
-//     //   (slide) =>
-//     //     slide.templateSlide === 'TitleSlide' ||
-//     //     slide.templateSlide === 'ImageWithCaption' ||
-//     //     slide.templateSlide === 'SectionHeader' ||
-//     //     slide.templateSlide === 'ClosingSlide'
-//     // );
-
-//     // We'll store a local, mutable copy and update it as we go
-//     const updatedSlides = [...slidesState];
-
-//     for (const slide of slidesToGenerateImages) {
-//       const payload = {
-//         prompt: imageGenerationPrompt({ title: slide.title, content: slide.content[0] }),
-//         processor: 'bfl',
-//         height: 1024,
-//         width: 1024,
-//       };
-
-//       try {
-//         // 1) Request a new image generation
-//         const response = (await GenerateImage(payload)) as { polling_url: string };
-//         // 2) Poll until the image is ready
-//         const imageUrl = await pollGeneratedImage(response.polling_url);
-
-//         if (imageUrl) {
-//             console.log(imageUrl, 'valid image gitten')
-//           // 3) If we got a valid image URL, update the slide's thumbnail
-//           const idx = updatedSlides.findIndex((s) => s.id === slide.id);
-//           if (idx !== -1) {
-//             updatedSlides[idx] = {
-//               ...updatedSlides[idx],
-//               thumbnail: imageUrl,
-//             };
-//           }
-//           // 4) Update state so UI re-renders with the new thumbnail
-//           setSlideState([...updatedSlides]);
-//         }
-//       } catch (error) {
-//         console.error('Error generating image for slide:', error);
-//       }
-//     }
-//   };
-
-const generateImagesForSlides = async (type: SlideTypeProps["type"]) => {
-    console.log("generation");
-    
-    // If 'type' is defined, only find slides of that template type
-    // Otherwise, find all that match the default set (TitleSlide, etc.)
-    const slidesToGenerateImages = type
-      ? slidesState.filter((slide) => slide.templateSlide === type)
-      : slidesState.filter(
-          (slide) =>
-            slide.templateSlide === "TitleSlide" ||
-            slide.templateSlide === "ImageWithCaption" ||
-            slide.templateSlide === "SectionHeader" ||
-            slide.templateSlide === "ClosingSlide"
-        );
-  
-    for (const slide of slidesToGenerateImages) {
-      const payload = {
-        prompt: imageGenerationPrompt({ title: slide.title, content: slide.content[0] }),
-        processor: "bfl",
-        height: 1024,
-        width: 1024,
-      };
-  
-      try {
-        // 1) Request a new image generation
-        const response = (await GenerateImage(payload)) as { polling_url: string };
-        // 2) Poll until the image is ready
-        const imageUrl = await pollGeneratedImage(response.polling_url);
-  
-        if (imageUrl) {
-          console.log(imageUrl, "valid image retrieved");
-  
-          // 3) Update the single slide's thumbnail in state
-          setSlideState((prevSlides) => {
-            // Make a copy of the previous slides
-            const updatedSlides = [...prevSlides];
-            // Find the target slide
-            const idx = updatedSlides.findIndex((s) => s.id === slide.id);
-            // If found, update only that slide's thumbnail
-            if (idx !== -1) {
-              updatedSlides[idx] = {
-                ...updatedSlides[idx],
-                thumbnail: imageUrl,
-              };
+    // 1) Polling function: Keep calling the PollingImage endpoint until success (or a timeout).
+    const pollGeneratedImage = async (pollingUrl: string): Promise<string | null> => {
+        // OPTIONAL: Add a maxRetries or timeout to avoid infinite loops
+        while (true) {
+            try {
+                const { status, result } = await PollingImage({ polling_url: pollingUrl }) as PollImageProps;
+                if (status?.toLowerCase() === 'ready') {
+                    return result?.sample || null;
+                }
+                // If not ready yet, wait 2 seconds then poll again
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+            } catch (error) {
+                console.error('Error polling image:', error);
+                return null;
             }
-            // Return new array to trigger re-render
-            return updatedSlides;
-          });
         }
-      } catch (error) {
-        console.error("Error generating image for slide:", error);
-      }
-    }
-  };
+    };
+
+    // 2) Generate images for each relevant slide and update thumbnail after polling is complete
+
+    //   const generateImagesForSlides = async (type: SlideTypeProps['type']) => {
+    //     console.log('generation')
+
+    //     const slidesToGenerateImages = type
+    //       ? slidesState.filter((slide) => slide.templateSlide === type)
+    //       : slidesState.filter(
+    //           (slide) =>
+    //             slide.templateSlide === 'TitleSlide' ||
+    //             slide.templateSlide === 'ImageWithCaption' ||
+    //             slide.templateSlide === 'SectionHeader' ||
+    //             slide.templateSlide === 'ClosingSlide'
+    //         );
+    //     // Filter slides that need an image
+    //     // const slidesToGenerateImages = slidesState.filter(
+    //     //   (slide) =>
+    //     //     slide.templateSlide === 'TitleSlide' ||
+    //     //     slide.templateSlide === 'ImageWithCaption' ||
+    //     //     slide.templateSlide === 'SectionHeader' ||
+    //     //     slide.templateSlide === 'ClosingSlide'
+    //     // );
+
+    //     // We'll store a local, mutable copy and update it as we go
+    //     const updatedSlides = [...slidesState];
+
+    //     for (const slide of slidesToGenerateImages) {
+    //       const payload = {
+    //         prompt: imageGenerationPrompt({ title: slide.title, content: slide.content[0] }),
+    //         processor: 'bfl',
+    //         height: 1024,
+    //         width: 1024,
+    //       };
+
+    //       try {
+    //         // 1) Request a new image generation
+    //         const response = (await GenerateImage(payload)) as { polling_url: string };
+    //         // 2) Poll until the image is ready
+    //         const imageUrl = await pollGeneratedImage(response.polling_url);
+
+    //         if (imageUrl) {
+    //             console.log(imageUrl, 'valid image gitten')
+    //           // 3) If we got a valid image URL, update the slide's thumbnail
+    //           const idx = updatedSlides.findIndex((s) => s.id === slide.id);
+    //           if (idx !== -1) {
+    //             updatedSlides[idx] = {
+    //               ...updatedSlides[idx],
+    //               thumbnail: imageUrl,
+    //             };
+    //           }
+    //           // 4) Update state so UI re-renders with the new thumbnail
+    //           setSlideState([...updatedSlides]);
+    //         }
+    //       } catch (error) {
+    //         console.error('Error generating image for slide:', error);
+    //       }
+    //     }
+    //   };
+
+    const generateImagesForSlides = async (type: SlideTypeProps["type"]) => {
+        console.log("generation");
+
+        // If 'type' is defined, only find slides of that template type
+        // Otherwise, find all that match the default set (TitleSlide, etc.)
+        const slidesToGenerateImages = type
+            ? slidesState.filter((slide) => slide.templateSlide === type)
+            : slidesState.filter(
+                (slide) =>
+                    slide.templateSlide === "TitleSlide" ||
+                    slide.templateSlide === "ImageWithCaption" ||
+                    slide.templateSlide === "SectionHeader" ||
+                    slide.templateSlide === "ClosingSlide"
+            );
+
+        for (const slide of slidesToGenerateImages) {
+            const payload = {
+                prompt: imageGenerationPrompt({ title: slide.title, content: slide.content[0] }),
+                processor: "bfl",
+                height: 1024,
+                width: 1024,
+            };
+
+            try {
+                // 1) Request a new image generation
+                const response = (await GenerateImage(payload)) as { polling_url: string };
+                // 2) Poll until the image is ready
+                const imageUrl = await pollGeneratedImage(response.polling_url);
+
+                if (imageUrl) {
+                    console.log(imageUrl, "valid image retrieved");
+
+                    // 3) Update the single slide's thumbnail in state
+                    setSlideState((prevSlides) => {
+                        // Make a copy of the previous slides
+                        const updatedSlides = [...prevSlides];
+                        // Find the target slide
+                        const idx = updatedSlides.findIndex((s) => s.id === slide.id);
+                        // If found, update only that slide's thumbnail
+                        if (idx !== -1) {
+                            updatedSlides[idx] = {
+                                ...updatedSlides[idx],
+                                thumbnail: imageUrl,
+                            };
+                        }
+                        // Return new array to trigger re-render
+                        return updatedSlides;
+                    });
+                }
+            } catch (error) {
+                console.error("Error generating image for slide:", error);
+            }
+        }
+    };
 
 
-  // 3) Kick off the generation on mount
-  useEffect(() => {
-    if (!slidesState.some(i => i.thumbnail)) {
-        generateImagesForSlides(null);
-    }
-  }, []);
+    // 3) Kick off the generation on mount
+    useEffect(() => {
+        if (!slidesState.some(i => i.thumbnail)) {
+            generateImagesForSlides(null);
+        }
+    }, []);
 
 
 
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="flex gap-4 justify-end p-4">
-                <Button onClick={() => router.push("/present")} variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
-                <Swords /> Challenge me
+                <Button variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
+                    <Swords /> Challenge me
                 </Button>
-                <Button onClick={() => router.push("/present")} variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
-                <Volume2 /> Present it to me
+                <Button variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
+                    <Volume2 /> Present it to me
                 </Button>
-                <Button onClick={() => router.push("/present")} variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
+                <Button variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
                     <Download /> Download
                 </Button>
                 <Button onClick={() => router.push("/present")} className="rounded-lg text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">
@@ -487,7 +504,7 @@ const generateImagesForSlides = async (type: SlideTypeProps["type"]) => {
                 <div className="col-span-1">
                     <div className="fixed w-[170px] shadow-[0_16px_36px_#542fb814] border rounded-md max-h-[700px] overflow-scroll bg-white p-2">
                         <div className="flex flex-col gap-4">
-                            {(slideStateWithThumbnail.length > 0 ? slideStateWithThumbnail : slidesState).map((slide, index) => (
+                            {(slideStates.length > 0 ? slideStates : slidesState).map((slide, index) => (
                                 slide ? (
                                     <SlideThumbnail
                                         key={index}
@@ -497,9 +514,9 @@ const generateImagesForSlides = async (type: SlideTypeProps["type"]) => {
                                         moveSlide={moveSlide}
                                         duplicateSlide={() => duplicateSlide(index)}
                                         removeSlide={() => removeSlide(index)}
+                                        content={slide}
                                     />
                                 ) : null
-                                // <div key={index}>side deck</div>
                             ))}
                         </div>
 
@@ -727,9 +744,10 @@ interface SlideThumbnailProps {
     moveSlide: (fromIndex: number, toIndex: number) => void;
     duplicateSlide?: () => void;
     removeSlide?: () => void;
+    content: Slide
 }
 
-const SlideThumbnail: React.FC<SlideThumbnailProps> = ({ src, alt, index, moveSlide, duplicateSlide, removeSlide }) => {
+const SlideThumbnail: React.FC<SlideThumbnailProps> = ({ src, alt, index, moveSlide, duplicateSlide, removeSlide, content }) => {
     const [, ref] = useDrag({
         type: ItemType.SLIDE,
         item: { index },
@@ -799,9 +817,13 @@ const SlideThumbnail: React.FC<SlideThumbnailProps> = ({ src, alt, index, moveSl
                         </TooltipProvider>
                     </span>
                 </div>
-                <div className="flex">
+                <div className="flex border-5 border-red-900 h-[100px]">
                     <DragHandleDots2Icon className="w-[20px]" />
-                    <Image src={src} alt={alt} width={135} height={135} className="rounded-md border-2" />
+                    {content.templateSlide === "TitleSlide" && <TitleThumbnail content={content} />}
+                    {content.templateSlide === "BulletList" && <BulletThumbnail content={content} />}
+                    {content.templateSlide === "ImageWithCaption" && <ImageCaptionThumbnail content={content} />}
+                    {content.templateSlide === "SectionHeader" && <SectionHeaderThumbnail content={content} />}
+                    {content.templateSlide === "ClosingSlide" && <ClosingThumbnail content={content} />}
                 </div>
             </div>
         </motion.div>

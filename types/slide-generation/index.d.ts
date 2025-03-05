@@ -22,6 +22,10 @@ export interface SlidesEditorProps {
     content: Slide
 }
 
+export interface ThumbnailProps {
+    content: Slide
+}
+
 export interface EnterPromptSlideProps {
     files: any[];
     user_prompt: string | undefined;
@@ -76,4 +80,23 @@ declare type contentThemesProps = {
 declare type ModifySlideByThemeProps = {
     slides: Slide[];
     theme: contentThemesProps
+}
+
+declare type QuestionTypeProps = {
+    question: string,
+    id: number
+}
+
+declare type GenerateInformedSlideInstructionProps = {
+    user_prompt: string;
+    questions: QuestionTypeProps[],
+    user_response: string;
+    pages: string;
+    tone: string;
+    output_language: string;
+    audience: string;
+}
+
+declare type SpinnerProps = {
+    size?: string
 }

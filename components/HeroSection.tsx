@@ -65,37 +65,43 @@ const HeroSection = () => {
     ]
 
     const refinePromptRequest = async () => {
-        setLoading(true);
-        const promptParameters = {
-            user_prompt: value,
-            pages: selectedPages,
-            tone: selectedTone,
-            output_language: selectedLanguage,
-            audience: selectedAudience,
-        }
+        // setLoading(true);
+        // const promptParameters = {
+        //     user_prompt: value,
+        //     pages: selectedPages,
+        //     tone: selectedTone,
+        //     output_language: selectedLanguage,
+        //     audience: selectedAudience,
+        // }
 
-        const payload = EnterPromptInstructions(promptParameters)
+        // const payload = EnterPromptInstructions(promptParameters)
 
-        const passedValue = {
-            files: payload.files,
-            user_prompt: payload.user_prompt,
-            username: payload.username,
-            password: payload.password,
-            temperature: payload.temperature
-        }
-        try {
+        // const passedValue = {
+        //     files: payload.files,
+        //     user_prompt: payload.user_prompt,
+        //     username: payload.username,
+        //     password: payload.password,
+        //     temperature: payload.temperature
+        // }
+        // try {
 
-            const result = await EnterPromptSlide(passedValue) as OpenAIResponse;
-            setLoading(false);
+        //     const result = await EnterPromptSlide(passedValue) as OpenAIResponse;
+        //     setLoading(false);
             
-            const generatedSlideContent = extractOpenAIResponseContent(result);
-            console.log(generatedSlideContent)
-            setSlideState(generatedSlideContent.slides.map((i: Slide) => ({ ...i, thumbnail: "" })))
-            router.push('/refine-request-topic')
-        } catch (error) {
-            setLoading(false);
-            console.error(error)
+        //     const generatedSlideContent = extractOpenAIResponseContent(result);
+        //     console.log(generatedSlideContent)
+        //     setSlideState(generatedSlideContent.slides.map((i: Slide) => ({ ...i, thumbnail: "" })))
+        //     router.push('/refine-request-topic')
+        // } catch (error) {
+        //     setLoading(false);
+        //     console.error(error)
+        // }
+        if (!value) {
+            console.log('please enter prompt')
+            return;
         }
+
+        router.push(`/refine-request-topic?user_prompt=${btoa(value)}&&pages=${btoa(selectedPages)}&&tone=${btoa(selectedTone)}&&output_language=${btoa(selectedLanguage)}&&audience=${btoa(selectedAudience)}`)
     }
 
     return (

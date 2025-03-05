@@ -90,7 +90,7 @@ const Page: React.FC = () => {
     return (
         <div className='bg-gradient-to-t from-primary-foreground via-primary-foreground to-white'>
         <div className='container mx-auto flex justify-between py-5'>
-            <div className='flex flex-col'>
+            <div className='flex flex-col w-full'>
                 {renderTheme()}
             </div>
         </div>

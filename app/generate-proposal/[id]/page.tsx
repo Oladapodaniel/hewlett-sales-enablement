@@ -116,16 +116,15 @@ const GenerateProposalPage: React.FC = () => {
 
     const updatePresentationTheme = async (theme: contentThemesProps) => {
         setSelectedTheme(theme.selected)
-        console.log(theme, 'theme here')
         setLoading(true);
-        
+
         const promptParameters = {
             slides: slideStates,
             theme
         }
-        
+
         const payload = ModifySlideByTheme(promptParameters)
-        
+
         const passedValue = {
             files: payload.files,
             user_prompt: payload.user_prompt,
@@ -134,17 +133,17 @@ const GenerateProposalPage: React.FC = () => {
             temperature: payload.temperature
         }
         try {
-            
+
             const result = await EnterPromptSlide(passedValue) as OpenAIResponse;
             setLoading(false);
-                    
-                    const generatedSlideContent = extractOpenAIResponseContent(result);
-                    console.log(generatedSlideContent, 'with new theme')
-                    setSlideState(generatedSlideContent.slides)
-                } catch (error) {
-                    setLoading(false);
-                    console.error(error)
-                }
+
+            const generatedSlideContent = extractOpenAIResponseContent(result);
+            console.log(generatedSlideContent, 'with new theme')
+            setSlideState(generatedSlideContent.slides)
+        } catch (error) {
+            setLoading(false);
+            console.error(error)
+        }
 
     }
 
@@ -229,7 +228,7 @@ const GenerateProposalPage: React.FC = () => {
                                             <div className='bg-secondary px-4 py-1 rounded-full'>{slideStates.length} Slides</div>
                                         </div>
                                         <div>
-                                            <Button onClick={() =>router.push("/slide-deck")} className="rounded-lg text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">Generate Presentation
+                                            <Button onClick={() => router.push("/slide-deck")} className="rounded-lg text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">Generate Presentation
                                                 <ArrowRightIcon className="w-6 h-5" />
                                             </Button>
                                         </div>

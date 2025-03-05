@@ -15,6 +15,5 @@ export interface OpenAIResponse {
 }
 
 export const extractOpenAIResponseContent = (response: OpenAIResponse) => {
-  console.log(response)
   return JSON.parse(response.choices[0].message.content);
 }

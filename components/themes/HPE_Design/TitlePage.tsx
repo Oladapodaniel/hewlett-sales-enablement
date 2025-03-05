@@ -56,7 +56,7 @@ const TitlePage: React.FC<SlidesEditorProps> = ({ mode, content }) => {
 
 
     return (
-        <div className={` bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'h-screen ' : 'rounded-lg'}`} style={{
+        <div className={` bg-cover bg-no-repeat p-12 w-full ${mode === 'presenting' ? 'min-h-screen ' : 'rounded-lg'}`} style={{
             backgroundImage: `url(${content?.thumbnail})`,
           }}>
             {!content.thumbnail ? (
