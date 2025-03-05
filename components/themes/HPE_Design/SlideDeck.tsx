@@ -1,8 +1,7 @@
 import React, { useRef, useState, useMemo, useEffect } from "react";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import Image, { StaticImageData } from "next/image";
-import { SectionProps } from "@/app/slide-deck/page"
+import { StaticImageData } from "next/image";
 import TitlePage from "./TitlePage";
 import SectionHeader from "./SectionHeader";
 import BulletList from "./BulletList";
@@ -10,11 +9,10 @@ import ImageWithCaption from "./ImageWithCaption";
 import ClosingSide from "./ClosingSlide";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { AlignLeft, ChevronDown, CircleMinus, CirclePlus, Download, Play, SparklesIcon, Swords, Volume2 } from "lucide-react";
+import { AlignLeft, ChevronDown, CircleMinus, CirclePlus, Download, Loader2, Play, SparklesIcon, Swords, Volume2 } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
@@ -30,12 +28,12 @@ import {
 } from "@/components/ui/tooltip"
 import { DragHandleDots2Icon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import { useTheme } from "@/context/ThemeContext";
-import { thumbnail_fifth, thumbnail_first, thumbnail_fourth, thumbnail_second, thumbnail_third } from "@/lib/images";
+// import { thumbnail_fifth, thumbnail_first, thumbnail_fourth, thumbnail_second, thumbnail_third } from "@/lib/images";
 import { Input } from "@/components/ui/input";
 import { editWithAIOptions } from "@/constants/util";
-import { imageGenerationPrompt, RefineSingleSlideInstructions } from "@/constants/modelInstructions";
+import { GenerateSpeakerMeetingNotes, imageGenerationPrompt, RefineSingleSlideInstructions } from "@/constants/modelInstructions";
 import { EnterPromptSlide } from "@/lib/actions/slide-generation/enter-prompt-slide";
-import { EnterPromptSlideProps, PollImageProps, Slide, SlideDeckProps, SlideTypeProps } from "@/types/slide-generation";
+import { PollImageProps, Slide, SlideDeckProps, SlideTypeProps } from "@/types/slide-generation";
 import { extractOpenAIResponseContent, OpenAIResponse } from "@/lib/utils";
 import Spinner from "@/components/reusables/Spinner";
 import { GenerateImage, PollingImage } from "@/lib/actions/image-generation/generate-image";
@@ -44,6 +42,7 @@ import BulletThumbnail from "./thumbnails/BulletThumbnail";
 import ImageCaptionThumbnail from "./thumbnails/ImageCaptionThumbnail";
 import SectionHeaderThumbnail from "./thumbnails/SectionHeaderThumbnail";
 import ClosingThumbnail from "./thumbnails/ClosingThumbnail";
+import { Textarea } from "@/components/ui/textarea";
 
 
 
@@ -59,6 +58,9 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     const [selectedAIActionIndex, setSelectedAIActionIndex] = useState<number>(-1);
     const [userPromptInput, setUserPromptInput] = useState<string>("");
     const [loadingSlideContent, setloadingSlideContent] = useState<boolean>(false);
+    const [displayMeetingNote, setDisplayMeetingNote] = useState<boolean>(false);
+    const [generatingNotes, setgeneratingNotes] = useState<boolean>(false);
+    const [meetingNotes, setmeetingNotes] = useState<string>("");
 
 
     const moveSlide = (fromIndex: number, toIndex: number) => {
@@ -482,6 +484,32 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     }, []);
 
 
+    const toggleMeetingNotes = () => setDisplayMeetingNote(!displayMeetingNote)
+
+    const generateMeetingNotes = async (slide: Slide) => {
+        const payload = GenerateSpeakerMeetingNotes({ slide })
+        setgeneratingNotes(true);
+        
+        const passedValue = {
+            files: payload.files,
+            user_prompt: payload.user_prompt,
+            username: payload.username,
+            password: payload.password,
+            temperature: payload.temperature
+        }
+        
+        try {
+            const updatedSlide = await EnterPromptSlide(passedValue) as OpenAIResponse
+            const result = extractOpenAIResponseContent(updatedSlide)
+            console.log(result, 'result')
+            setgeneratingNotes(false);
+            setmeetingNotes(result.notes)
+        } catch (error) {
+            console.log(error)
+            setgeneratingNotes(false);
+        }
+    }
+
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -720,6 +748,13 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                     </div>
                                 ) : null
                                 }
+                                <div className="mt-5">
+                                    {displayMeetingNote && <Textarea placeholder="Enter your meeting or generate with AI 💫" value={meetingNotes} onChange={(val) => setmeetingNotes} />}
+                                    <div className="flex justify-end mt-4">
+                                        {!displayMeetingNote && <div className="bg-secondary rounded-full py-1 px-3 flex gap-3 cursor-pointer" onClick={toggleMeetingNotes}><div>Meeting Notes</div></div>}
+                                        {displayMeetingNote && <div className="bg-secondary rounded-full py-1 px-3 flex gap-3 cursor-pointer" onClick={() => generateMeetingNotes(slide)}><div>💫 &nbsp;Generate Meeting Notes</div>{generatingNotes && <Loader2 className="animate-spin text-primary" />}</div>}
+                                    </div>
+                                </div>
                             </div>
                         )
                         )

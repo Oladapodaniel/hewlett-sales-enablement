@@ -105,3 +105,7 @@ declare type ModifySlideByUserPromptProps = {
     slides: Slide[];
     user_prompt: string;
 }
+
+declare type GenerateSpeakerMeetingNotesProps = {
+    slide: Slide
+}

@@ -1,4 +1,4 @@
-import { EnterPromptInstructionsProps, GenerateInformedSlideInstructionProps, imageGenerationPromptProps, ModifySlideByThemeProps, ModifySlideByUserPromptProps, RefineSingleSlideInstructionsProps } from "@/types/slide-generation";
+import { EnterPromptInstructionsProps, GenerateInformedSlideInstructionProps, GenerateSpeakerMeetingNotesProps, imageGenerationPromptProps, ModifySlideByThemeProps, ModifySlideByUserPromptProps, RefineSingleSlideInstructionsProps } from "@/types/slide-generation";
 
 export const EnterPromptInstructions = ({ user_prompt, pages, tone, output_language, audience }: EnterPromptInstructionsProps) => {
   return {
@@ -361,6 +361,39 @@ export const ModifySlideByUserPrompt = ({ slides, user_prompt }: ModifySlideByUs
     }),
     username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
     password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
+    temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
+  };
+};
+
+
+export const GenerateSpeakerMeetingNotes = ({ slide }: GenerateSpeakerMeetingNotesProps) => {
+  return {
+    files: [],
+    user_prompt: JSON.stringify({
+      messages: [
+        {
+          role: "system",
+          content: `You are a slide content generator. You have one slide's content which needs speaker or meeting notes. Here is the slide in JSON format: ${JSON.stringify(
+            slide
+          )}.\n\nGenerate speaker notes that help present this slide effectively. The notes must be a single string, where line breaks or bullet points are separated by \n (newline characters).\n\nReturn your response in valid JSON. Do not add extra commentary or explanations outside the JSON. If no note can be generated, return an empty string for 'notes'.`
+        }
+      ],
+      json_schema: {
+        $schema: "http://json-schema.org/draft-07/schema#",
+        title: "SpeakerNotes",
+        description: "Schema for AI-generated meeting or speaker notes.",
+        type: "object",
+        properties: {
+          notes: {
+            type: "string",
+            description: "A single string containing the speaker or meeting notes. Use \n for newlines."
+          }
+        },
+        required: ["notes"]
+      }
+    }),
+    username: process.env.NEXT_PUBLIC_OPENAI_USERNAME || "",
+    password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD || "",
     temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
   };
 };
