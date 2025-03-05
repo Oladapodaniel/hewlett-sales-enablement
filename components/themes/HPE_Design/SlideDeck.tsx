@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect, ChangeEvent } from "react";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { StaticImageData } from "next/image";
 import TitlePage from "./TitlePage";
 import SectionHeader from "./SectionHeader";
 import BulletList from "./BulletList";
