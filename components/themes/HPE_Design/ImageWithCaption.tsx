@@ -3,7 +3,7 @@
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { box_green_band, green_band, image_placeholder_theme } from '@/lib/images';
+import { box_green_band, green_band } from '@/lib/images';
 import Image from 'next/image';
 import { Slide, SlidesEditorProps } from '@/types/slide-generation';
 import Spinner from '@/components/reusables/Spinner';

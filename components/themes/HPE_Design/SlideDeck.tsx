@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, useEffect } from "react";
+import React, { useRef, useState, useEffect, ChangeEvent } from "react";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { StaticImageData } from "next/image";
@@ -48,7 +48,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     const router = useRouter();
-    const [slidesState, setSlides] = useState(slides);
+    const [slidesState] = useState(slides);
     const { slideStates, setSlideState } = useTheme()
     const [openIndex, setOpenIndex] = useState<number | null>(null);
     const [selectedIndex, setselectedIndex] = useState<number | null>(null);
@@ -204,7 +204,7 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                 const result = extractOpenAIResponseContent(updatedSlide)
                 console.log(result, 'result')
                 const updatedSlides = [...slideStates];
-                let updateResult = result.slide
+                const updateResult = result.slide
                 updateResult.thumbnail = updatedSlides[selectedAIActionIndex].thumbnail
                 updatedSlides[selectedAIActionIndex] = updateResult;
                 console.log(updateResult, 'updated result')
@@ -486,6 +486,10 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
 
     const toggleMeetingNotes = () => setDisplayMeetingNote(!displayMeetingNote)
 
+    const handleMeetingNotes = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        setmeetingNotes(e.target.value)
+    }
+
     const generateMeetingNotes = async (slide: Slide) => {
         const payload = GenerateSpeakerMeetingNotes({ slide })
         setgeneratingNotes(true);
@@ -537,8 +541,6 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                     <SlideThumbnail
                                         key={index}
                                         index={index}
-                                        src={slide.thumbnail}
-                                        alt={`Slide ${index + 1}`}
                                         moveSlide={moveSlide}
                                         duplicateSlide={() => duplicateSlide(index)}
                                         removeSlide={() => removeSlide(index)}
@@ -749,7 +751,7 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                 ) : null
                                 }
                                 <div className="mt-5">
-                                    {displayMeetingNote && <Textarea placeholder="Enter your meeting or generate with AI 💫" value={meetingNotes} onChange={(val) => setmeetingNotes} />}
+                                    {displayMeetingNote && <Textarea placeholder="Enter your meeting or generate with AI 💫" value={meetingNotes} onChange={handleMeetingNotes} />}
                                     <div className="flex justify-end mt-4">
                                         {!displayMeetingNote && <div className="bg-secondary rounded-full py-1 px-3 flex gap-3 cursor-pointer" onClick={toggleMeetingNotes}><div>Meeting Notes</div></div>}
                                         {displayMeetingNote && <div className="bg-secondary rounded-full py-1 px-3 flex gap-3 cursor-pointer" onClick={() => generateMeetingNotes(slide)}><div>💫 &nbsp;Generate Meeting Notes</div>{generatingNotes && <Loader2 className="animate-spin text-primary" />}</div>}
@@ -773,8 +775,6 @@ const ItemType = {
 };
 
 interface SlideThumbnailProps {
-    src: string | StaticImageData;
-    alt: string;
     index: number;
     moveSlide: (fromIndex: number, toIndex: number) => void;
     duplicateSlide?: () => void;
@@ -782,7 +782,7 @@ interface SlideThumbnailProps {
     content: Slide
 }
 
-const SlideThumbnail: React.FC<SlideThumbnailProps> = ({ src, alt, index, moveSlide, duplicateSlide, removeSlide, content }) => {
+const SlideThumbnail: React.FC<SlideThumbnailProps> = ({ index, moveSlide, duplicateSlide, removeSlide, content }) => {
     const [, ref] = useDrag({
         type: ItemType.SLIDE,
         item: { index },

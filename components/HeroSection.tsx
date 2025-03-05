@@ -29,11 +29,6 @@ import { Textarea } from './ui/textarea'
 import { salesforce_logo } from '@/lib/images'
 import ResizableTextArea from './reusables/ResizableTextArea'
 import { audience, language, pagesRange, tone } from '@/constants/util'
-import { EnterPromptSlide } from '@/lib/actions/slide-generation/enter-prompt-slide'
-import { EnterPromptInstructions } from '@/constants/modelInstructions'
-import { useTheme } from '@/context/ThemeContext'
-import { extractOpenAIResponseContent, OpenAIResponse } from '@/lib/utils'
-import { Slide } from '@/types/slide-generation'
 
 
 
@@ -43,8 +38,6 @@ const HeroSection = () => {
     const [value, setValue] = useState<string>('');
     const textAreaRef = useRef<HTMLTextAreaElement>(null)
     const [manualFocus, setManualfocus] = useState<HTMLTextAreaElement | null>(null)
-    const [loading, setLoading] = useState<boolean>(false)
-    const { setSlideState } = useTheme();
     const [selectedPages, setSelectedPages] = useState<string>("");
     const [selectedLanguage, setSelectedLanguages] = useState<string>("");
     const [selectedTone, setSelectedTone] = useState<string>("");
@@ -156,7 +149,7 @@ const HeroSection = () => {
                                                 }}
 
                                             />
-                                            <Button disabled={loading} onClick={refinePromptRequest} className="absolute bottom-1 border-2 border-[#04e1af] right-1 rounded-[12px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                            <Button onClick={refinePromptRequest} className="absolute bottom-1 border-2 border-[#04e1af] right-1 rounded-[12px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
                                                 <PaperPlaneIcon />
                                             </Button>
                                         </div>

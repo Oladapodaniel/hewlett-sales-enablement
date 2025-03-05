@@ -1,6 +1,6 @@
 'use client';
 
-import React, { JSX, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion";
 import ResizableTextArea from "@/components/reusables/ResizableTextArea";
 import { Button } from "@/components/ui/button";

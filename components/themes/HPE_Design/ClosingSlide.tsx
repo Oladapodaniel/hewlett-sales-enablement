@@ -5,7 +5,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { green_band, logo_2 } from '@/lib/images';
 import Image from 'next/image';
-import { SectionProps } from '@/app/slide-deck/page';
 import { Slide, SlidesEditorProps } from '@/types/slide-generation';
 import Spinner from '@/components/reusables/Spinner';
 

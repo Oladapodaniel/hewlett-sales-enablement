@@ -20,7 +20,6 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import DraggableSection from '@/components/reusables/DragAndDropCards';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
-import { SectionProps } from '@/app/slide-deck/page';
 import { contentThemesProps, Slide } from '@/types/slide-generation';
 import { ModifySlideByTheme, ModifySlideByUserPrompt } from '@/constants/modelInstructions';
 import { extractOpenAIResponseContent, OpenAIResponse } from '@/lib/utils';
