@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
 import Spinner from '@/components/reusables/Spinner';
 import Elipsis from '@/components/reusables/Elipsis';
@@ -22,16 +22,21 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
 import { SectionProps } from '@/app/slide-deck/page';
 import { contentThemesProps, Slide } from '@/types/slide-generation';
-import { ModifySlideByTheme } from '@/constants/modelInstructions';
+import { ModifySlideByTheme, ModifySlideByUserPrompt } from '@/constants/modelInstructions';
 import { extractOpenAIResponseContent, OpenAIResponse } from '@/lib/utils';
 import { EnterPromptSlide } from '@/lib/actions/slide-generation/enter-prompt-slide';
+import ResizableTextArea from '@/components/reusables/ResizableTextArea';
+import { PaperPlaneIcon } from '@radix-ui/react-icons';
+import { toast } from "sonner"
+
 
 const GenerateProposalPage: React.FC = () => {
     const router = useRouter();
     const [loading, setLoading] = React.useState(true);
     const [selectedTheme, setSelectedTheme] = React.useState("1");
     const { slideStates, setSlideState } = useTheme();
-    // const [sections, setSections] = useState([...slideStates])
+    const [value, setvalue] = useState<string>("");
+    const [loadingNewStructure, setloadingNewStructure] = useState<boolean>(false)
 
     const contentThemes: contentThemesProps[] = [
         {
@@ -116,7 +121,7 @@ const GenerateProposalPage: React.FC = () => {
 
     const updatePresentationTheme = async (theme: contentThemesProps) => {
         setSelectedTheme(theme.selected)
-        setLoading(true);
+        setloadingNewStructure(true);
 
         const promptParameters = {
             slides: slideStates,
@@ -135,13 +140,48 @@ const GenerateProposalPage: React.FC = () => {
         try {
 
             const result = await EnterPromptSlide(passedValue) as OpenAIResponse;
-            setLoading(false);
+            setloadingNewStructure(false);
 
             const generatedSlideContent = extractOpenAIResponseContent(result);
             console.log(generatedSlideContent, 'with new theme')
             setSlideState(generatedSlideContent.slides)
+            toast("✅ Slides generated")
         } catch (error) {
-            setLoading(false);
+            setloadingNewStructure(false);
+            console.error(error)
+        }
+
+    }
+
+    const updatePresentationUserPrompt = async () => {
+        setloadingNewStructure(true);
+
+        const promptParameters = {
+            slides: slideStates,
+            user_prompt: value
+        }
+
+        const payload = ModifySlideByUserPrompt(promptParameters)
+
+        const passedValue = {
+            files: payload.files,
+            user_prompt: payload.user_prompt,
+            username: payload.username,
+            password: payload.password,
+            temperature: payload.temperature
+        }
+        try {
+
+            const result = await EnterPromptSlide(passedValue) as OpenAIResponse;
+            setloadingNewStructure(false);
+
+            const generatedSlideContent = extractOpenAIResponseContent(result);
+            console.log(generatedSlideContent, 'by user prompt')
+            setvalue("");
+            setSlideState(generatedSlideContent.slides)
+            toast("✅ Success")
+        } catch (error) {
+            setloadingNewStructure(false);
             console.error(error)
         }
 
@@ -211,9 +251,17 @@ const GenerateProposalPage: React.FC = () => {
                                                 )}
                                             </div>
                                         </RadioGroup>
+                                        <div className="relative w-full mt-10">
+                                            <ResizableTextArea
+                                                value={value}
+                                                onChange={(val) => setvalue(val)}
+                                                placeholder="💫 Ask AI to do anything"
+                                            />
+                                            <Button onClick={updatePresentationUserPrompt} className="absolute bottom-1 border-2 border-[#04e1af] right-1 w-[40px] h-[40px] rounded-lg bg-[#03A983] shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit"><PaperPlaneIcon /></Button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="col-span-2 md:col-span-1">
+                                <div className="col-span-2 md:col-span-1 h-[800px] overflow-scroll">
                                     <div className='flex flex-col md:flex-row items-center justify-between gap-3 mb-5'>
                                         <div className='flex items-center gap-3'>
                                             <div className='flex items-center gap-3 p-2'>
@@ -234,7 +282,10 @@ const GenerateProposalPage: React.FC = () => {
                                         </div>
                                     </div>
                                     <DndProvider backend={HTML5Backend}>
-                                        <div className="p-4">
+                                        <div className="p-4 relative">
+                                            {loadingNewStructure && (<div className="absolute flex w-full h-4/5 justify-center items-center ">
+                                                <Spinner />
+                                            </div>)}
                                             {slideStates.map((section, index) => (
                                                 <DraggableSection
                                                     key={index}

@@ -121,7 +121,7 @@ const RefineRequestPrompt: React.FC = () => {
     return (
         <div className="container mx-auto">
             <main className="flex items-center justify-center w-full">
-                <div className="flex flex-col items-center justify-center w-full xl:w-3/5">
+                <div className="flex flex-col items-center justify-center w-full  pb-[200px] xl:w-3/5">
                     <motion.h3
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -173,7 +173,7 @@ const RefineRequestPrompt: React.FC = () => {
                             <motion.div
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.7 }}
+                                transition={{ duration: 0.5 }}
                                 className="w-1/2 bg-gray-100 mt-8 text-black font-[400] text-[20px] text-md p-3 rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl"
                             >
                                 {userResponse}
@@ -192,7 +192,7 @@ const RefineRequestPrompt: React.FC = () => {
                                 onChange={handleChange}
                                 placeholder="Enter your response here..."
                             />
-                            <Button onClick={generateInformedSlideContent} className="absolute bottom-1 right-1 w-[40px] h-[40px] rounded-lg bg-[#03A983] shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit"><PaperPlaneIcon /></Button>
+                            <Button onClick={generateInformedSlideContent} className="absolute bottom-1 border-2 border-[#04e1af] right-1 w-[40px] h-[40px] rounded-lg bg-[#03A983] shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit"><PaperPlaneIcon /></Button>
                         </div>
                     </div>
                     {/* </motion.div> */}

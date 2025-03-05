@@ -100,3 +100,8 @@ declare type GenerateInformedSlideInstructionProps = {
 declare type SpinnerProps = {
     size?: string
 }
+
+declare type ModifySlideByUserPromptProps = {
+    slides: Slide[];
+    user_prompt: string;
+}

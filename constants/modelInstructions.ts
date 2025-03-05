@@ -1,4 +1,4 @@
-import { EnterPromptInstructionsProps, GenerateInformedSlideInstructionProps, imageGenerationPromptProps, ModifySlideByThemeProps, RefineSingleSlideInstructionsProps } from "@/types/slide-generation";
+import { EnterPromptInstructionsProps, GenerateInformedSlideInstructionProps, imageGenerationPromptProps, ModifySlideByThemeProps, ModifySlideByUserPromptProps, RefineSingleSlideInstructionsProps } from "@/types/slide-generation";
 
 export const EnterPromptInstructions = ({ user_prompt, pages, tone, output_language, audience }: EnterPromptInstructionsProps) => {
   return {
@@ -300,128 +300,67 @@ export const GenerateInformedSlideInstruction = ({ user_prompt, questions, user_
     password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
     temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
   };
+}
+
+export const ModifySlideByUserPrompt = ({ slides, user_prompt }: ModifySlideByUserPromptProps) => {
+  return {
+    files: [],
+    user_prompt: JSON.stringify({
+      messages: [
+        {
+          role: "system",
+          content: `You are a slide content generator. You have generated some slides for me in JSON format: "${JSON.stringify(slides)}". Modify the content of the slide to match the user prompt, Here is the user prompt: "${user_prompt} and return it in JSON format.`
+        },
+        {
+          role: "system",
+          content: "IMPORTANT: Your response must strictly follow the JSON schema provided below, no additional data outside the JSON. If no slide content can be generated, return an object with an empty 'slide' property. Do not wrap your JSON response in triple backticks, do not use Markdown formatting. Return only valid JSON. Let the thumbnail property in the return JSON be set to empty stringIMPORTANT: Your response must strictly follow the JSON schema provided below, no additional data outside the JSON. If no slide content can be generated, return an object with an empty 'slide' property. Do not wrap your JSON response in triple backticks, do not use Markdown formatting. Return only valid JSON. Let the thumbnail property in the return JSON be set to empty string"
+        }
+      ],
+      json_schema: {
+        $schema: "http://json-schema.org/draft-07/schema#",
+        title: "Slide Deck",
+        description: "A schema for generating slide content for a slide deck. The output should be an object with a 'slides' array. Each slide should have a 'title', 'id', 'templateSlide', 'content', and 'thumbnail'.",
+        type: "object",
+        properties: {
+          slides: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                title: {
+                  type: "string",
+                  description: "The title of the slide."
+                },
+                id: {
+                  type: "number",
+                  description: "A unique identifier for the slide."
+                },
+                templateSlide: {
+                  type: "string",
+                  description: "The template of the slide (e.g., TitleSlide, SectionHeader, BulletList, ImageWithCaption, ClosingSlide)."
+                },
+                content: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                    description: "Content for the slide."
+                  },
+                  description: "An array of content strings for the slide."
+                },
+                thumbnail: {
+                  type: "string",
+                  description: "A URL or identifier for the thumbnail image."
+                }
+              },
+              required: ["title", "id", "templateSlide", "content", "thumbnail"]
+            }
+          }
+        },
+        required: ["slides"]
+      }
+    }),
+    username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
+    password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
+    temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
+  };
 };
-// export const GenerateInformedSlideInstruction = ({ user_prompt, questions, user_response, pages, tone, output_language, audience }: GenerateInformedSlideInstructionProps) => {
-//   return {
-//     files: [],
-//     user_prompt: JSON.stringify({
-//       messages: [
-//         {
-//           role: "system",
-//           content: `You are a slide content generator. Based on the user's prompt: "${user_prompt}", and their responses to the following questions: "${JSON.stringify(questions)}", here are the user's responses: "${JSON.stringify(user_response)}". Generate a slide deck with the following details. Each slide should include: 'title', 'id', 'templateSlide', 'content' (an array of strings), and a 'thumbnail'. Stick to the JSON schema. Do not add any extra commentary or text beyond the JSON structure.`
-//         },
-//         {
-//           role: "system",
-//           content: "IMPORTANT: Your response must strictly follow the JSON schema provided below—no additional explanations or data outside the JSON. If no slide content can be generated, return an object with an empty 'slides' array. Do not wrap your JSON response in triple backticks, do not use Markdown formatting. Return only valid JSON. Let the thumbnail property in the return JSON be set to empty stringIMPORTANT: Your response must strictly follow the JSON schema provided below, no additional data outside the JSON. If no slide content can be generated, return an object with an empty 'slide' property. Do not wrap your JSON response in triple backticks, do not use Markdown formatting. Return only valid JSON"
-//         }
-//       ],
-//       json_schema: {
-//         $schema: "http://json-schema.org/draft-07/schema#",
-//         title: "Slide Deck",
-//         description: "A schema for generating slide content for a slide deck. The output should be an object with a 'slides' array. Each slide should have a 'title', 'id', 'templateSlide', 'content', and 'thumbnail'.",
-//         type: "object",
-//         properties: {
-//           slides: {
-//             type: "array",
-//             items: {
-//               type: "object",
-//               properties: {
-//                 title: {
-//                   type: "string",
-//                   description: "The title of the slide."
-//                 },
-//                 id: {
-//                   type: "number",
-//                   description: "A unique identifier for the slide."
-//                 },
-//                 templateSlide: {
-//                   type: "string",
-//                   description: "The template of the slide (e.g., TitleSlide, SectionHeader, BulletList, ImageWithCaption, ClosingSlide)."
-//                 },
-//                 content: {
-//                   type: "array",
-//                   items: {
-//                     type: "string",
-//                     description: "Content for the slide."
-//                   },
-//                   description: "An array of content strings for the slide."
-//                 },
-//                 thumbnail: {
-//                   type: "string",
-//                   description: "A URL or identifier for the thumbnail image."
-//                 }
-//               },
-//               required: ["title", "id", "templateSlide", "content", "thumbnail"]
-//             }
-//           }
-//         },
-//         required: ["slides"]
-//       }
-//     }),
-//     username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
-//     password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
-//     temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
-//   };
-// };
-// export const GenerateInformedSlideInstruction = ({ user_prompt, questions, user_response }: GenerateInformedSlideInstructionProps) => {
-//   return {
-//     files: [],
-//     user_prompt: JSON.stringify({
-//       messages: [
-//         {
-//           role: "system",
-//           content: `You are a slide content generator. You have generated some slides for me in JSON format, here is the generated slide: "${JSON.stringify(slides)}". Modify the content of the slide to match this theme name: "${theme.name}" and theme description: "${theme.description}" and return it in JSON format.`
-//         },
-//         {
-//           role: "system",
-//           content: "IMPORTANT: Your response must strictly follow the JSON schema provided below, no additional data outside the JSON. If no slide content can be generated, return an object with an empty 'slide' property. Do not wrap your JSON response in triple backticks, do not use Markdown formatting. Return only valid JSON. Let the thumbnail property in the return JSON be set to empty stringIMPORTANT: Your response must strictly follow the JSON schema provided below, no additional data outside the JSON. If no slide content can be generated, return an object with an empty 'slide' property. Do not wrap your JSON response in triple backticks, do not use Markdown formatting. Return only valid JSON. Let the thumbnail property in the return JSON be set to empty string"
-//         }
-//       ],
-//       json_schema: {
-//         $schema: "http://json-schema.org/draft-07/schema#",
-//         title: "Slide Deck",
-//         description: "A schema for generating slide content for a slide deck. The output should be an object with a 'slides' array. Each slide should have a 'title', 'id', 'templateSlide', 'content', and 'thumbnail'.",
-//         type: "object",
-//         properties: {
-//           slides: {
-//             type: "array",
-//             items: {
-//               type: "object",
-//               properties: {
-//                 title: {
-//                   type: "string",
-//                   description: "The title of the slide."
-//                 },
-//                 id: {
-//                   type: "number",
-//                   description: "A unique identifier for the slide."
-//                 },
-//                 templateSlide: {
-//                   type: "string",
-//                   description: "The template of the slide (e.g., TitleSlide, SectionHeader, BulletList, ImageWithCaption, ClosingSlide)."
-//                 },
-//                 content: {
-//                   type: "array",
-//                   items: {
-//                     type: "string",
-//                     description: "Content for the slide."
-//                   },
-//                   description: "An array of content strings for the slide."
-//                 },
-//                 thumbnail: {
-//                   type: "string",
-//                   description: "A URL or identifier for the thumbnail image."
-//                 }
-//               },
-//               required: ["title", "id", "templateSlide", "content", "thumbnail"]
-//             }
-//           }
-//         },
-//         required: ["slides"]
-//       }
-//     }),
-//     username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
-//     password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
-//     temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
-//   };
-// };

@@ -156,7 +156,7 @@ const HeroSection = () => {
                                                 }}
 
                                             />
-                                            <Button disabled={loading} onClick={refinePromptRequest} className="absolute bottom-1 right-1 rounded-[12px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                            <Button disabled={loading} onClick={refinePromptRequest} className="absolute bottom-1 border-2 border-[#04e1af] right-1 rounded-[12px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
                                                 <PaperPlaneIcon />
                                             </Button>
                                         </div>

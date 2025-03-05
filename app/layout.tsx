@@ -3,6 +3,8 @@ import localFont from 'next/font/local';
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import HeaderNav from "@/components/HeaderNav";
+import { Toaster } from "@/components/ui/sonner"
+
 
 
 const testMetricFont = localFont({
@@ -35,6 +37,7 @@ export default function RootLayout({
         <ThemeProvider>
         <HeaderNav />
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
