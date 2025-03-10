@@ -1,3 +1,5 @@
+import { envConfig } from "@/lib/config";
+import { stageName } from "@/lib/utils";
 import { EnterPromptInstructionsProps, GenerateInformedSlideInstructionProps, GenerateSpeakerMeetingNotesProps, imageGenerationPromptProps, ModifySlideByThemeProps, ModifySlideByUserPromptProps, RefineSingleSlideInstructionsProps } from "@/types/slide-generation";
 
 export const EnterPromptInstructions = ({ user_prompt, pages, tone, output_language, audience }: EnterPromptInstructionsProps) => {
@@ -57,21 +59,21 @@ export const EnterPromptInstructions = ({ user_prompt, pages, tone, output_langu
         required: ["slides"]
       }
     }),
-    username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
-    password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
-    temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
+    username: envConfig[stageName]?.OPENAI_USERNAME,
+    password: envConfig[stageName]?.OPENAI_PASSWORD,
+    temperature: envConfig[stageName]?.OPENAI_TEMPERATURE
   };
 };
 
 
-export const RefineSlideAIModelEnquiry = (user_prompt: string) => {
+export const RefineSlideAIModelEnquiry = ({ user_prompt, pages, tone, output_language, audience }: EnterPromptInstructionsProps) => {
   return {
     files: [],
     user_prompt: JSON.stringify({
       messages: [
         {
           role: "system",
-          content: `You are a slide content generator. A user has prompt you to generate a slide deck for presentation based on a topic, Here is the user prompt: "${user_prompt}". Based on your understanding of this prompt, ask the user 3 questions to better refine their prompt and make you understand their specific request. Return this questions in JSON format. The questions should include: 'question', 'id'. Stick to the JSON schema. Do not add any extra commentary or text beyond the JSON structure.`
+          content: `You are a slide content generator. A user has prompt you to generate a slide deck for presentation based on a topic, Here is the user prompt: "${user_prompt}", they requested you create "${pages}" pages, with "${tone}" tone and "${output_language}" language, with a "${audience}" audience. Based on your understanding of this prompt, ask the user 3 questions to better refine their prompt and make you understand their specific request. Return this questions in JSON format. The questions should include: 'question', 'id'. Stick to the JSON schema. Do not add any extra commentary or text beyond the JSON structure.`
         },
         {
           role: "system",
@@ -102,9 +104,9 @@ export const RefineSlideAIModelEnquiry = (user_prompt: string) => {
         required: ["questions"]
       }
     }),
-    username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
-    password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
-    temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
+    username: envConfig[stageName]?.OPENAI_USERNAME,
+    password: envConfig[stageName]?.OPENAI_PASSWORD,
+    temperature: envConfig[stageName]?.OPENAI_TEMPERATURE
   };
 }
 
@@ -163,9 +165,9 @@ export const RefineSingleSlideInstructions = ({ slideToUpdate, user_prompt }: Re
         required: ["slide"]
       }
     }),
-    username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
-    password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
-    temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
+    username: envConfig[stageName]?.OPENAI_USERNAME,
+    password: envConfig[stageName]?.OPENAI_PASSWORD,
+    temperature: envConfig[stageName]?.OPENAI_TEMPERATURE
   };
 };
 
@@ -233,9 +235,9 @@ export const ModifySlideByTheme = ({ slides, theme }: ModifySlideByThemeProps) =
         required: ["slides"]
       }
     }),
-    username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
-    password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
-    temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
+    username: envConfig[stageName]?.OPENAI_USERNAME,
+    password: envConfig[stageName]?.OPENAI_PASSWORD,
+    temperature: envConfig[stageName]?.OPENAI_TEMPERATURE
   };
 };
 
@@ -296,9 +298,9 @@ export const GenerateInformedSlideInstruction = ({ user_prompt, questions, user_
         required: ["slides"]
       }
     }),
-    username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
-    password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
-    temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
+    username: envConfig[stageName]?.OPENAI_USERNAME,
+    password: envConfig[stageName]?.OPENAI_PASSWORD,
+    temperature: envConfig[stageName]?.OPENAI_TEMPERATURE
   };
 }
 
@@ -359,9 +361,9 @@ export const ModifySlideByUserPrompt = ({ slides, user_prompt }: ModifySlideByUs
         required: ["slides"]
       }
     }),
-    username: process.env.NEXT_PUBLIC_OPENAI_USERNAME,
-    password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD,
-    temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
+    username: envConfig[stageName]?.OPENAI_USERNAME,
+    password: envConfig[stageName]?.OPENAI_PASSWORD,
+    temperature: envConfig[stageName]?.OPENAI_TEMPERATURE
   };
 };
 
@@ -375,7 +377,7 @@ export const GenerateSpeakerMeetingNotes = ({ slide }: GenerateSpeakerMeetingNot
           role: "system",
           content: `You are a slide content generator. You have one slide's content which needs speaker or meeting notes. Here is the slide in JSON format: ${JSON.stringify(
             slide
-          )}.\n\nGenerate speaker notes that help present this slide effectively. The notes must be a single string, where line breaks or bullet points are separated by \n (newline characters).\n\nReturn your response in valid JSON. Do not add extra commentary or explanations outside the JSON. If no note can be generated, return an empty string for 'notes'.`
+          )}.\n\nGenerate speaker notes that help present this slide effectively. The notes must be a single string, where line breaks or bullet points are separated by \n\n (newline characters).\n\nReturn your response in valid JSON. Do not add extra commentary or explanations outside the JSON. If no note can be generated, return an empty string for 'notes'.`
         }
       ],
       json_schema: {
@@ -392,8 +394,8 @@ export const GenerateSpeakerMeetingNotes = ({ slide }: GenerateSpeakerMeetingNot
         required: ["notes"]
       }
     }),
-    username: process.env.NEXT_PUBLIC_OPENAI_USERNAME || "",
-    password: process.env.NEXT_PUBLIC_OPENAI_PASSWORD || "",
-    temperature: process.env.NEXT_PUBLIC_OPENAI_TEMPERATURE
+    username: envConfig[stageName]?.OPENAI_USERNAME || "",
+    password: envConfig[stageName]?.OPENAI_PASSWORD || "",
+    temperature: envConfig[stageName]?.OPENAI_TEMPERATURE
   };
 };

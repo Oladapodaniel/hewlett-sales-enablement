@@ -6,6 +6,10 @@ export interface Slide {
     templateSlide: string;
     content: string[];
     thumbnail: string;
+
+    // optional properties
+    displayMeetingNote?: boolean
+    meetingNotes?: string
 }
 
 export interface SlideDeck {
@@ -109,3 +113,14 @@ declare type ModifySlideByUserPromptProps = {
 declare type GenerateSpeakerMeetingNotesProps = {
     slide: Slide
 }
+
+declare type EnvConfigType = {
+     CLIENT_ID: string;
+     CLIENT_SECRET: string;
+     APP_BASE_URL: string;
+     IMAGE_CLIENT_ID: string;
+     IMAGE_CLIENT_SECRET: string;
+     OPENAI_USERNAME: string;
+     OPENAI_PASSWORD: string;
+     OPENAI_TEMPERATURE: string;
+    }

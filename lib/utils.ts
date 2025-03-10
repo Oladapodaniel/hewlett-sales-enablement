@@ -5,6 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const stageName = process.env.NEXT_PUBLIC_ENV_STAGE_NAME || 'LOCAL'
+
 export interface OpenAIResponse {
   choices: {
     message: {

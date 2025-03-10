@@ -57,9 +57,9 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     const [selectedAIActionIndex, setSelectedAIActionIndex] = useState<number>(-1);
     const [userPromptInput, setUserPromptInput] = useState<string>("");
     const [loadingSlideContent, setloadingSlideContent] = useState<boolean>(false);
-    const [displayMeetingNote, setDisplayMeetingNote] = useState<boolean>(false);
+    // const [displayMeetingNote, setDisplayMeetingNote] = useState<boolean>(false);
     const [generatingNotes, setgeneratingNotes] = useState<boolean>(false);
-    const [meetingNotes, setmeetingNotes] = useState<string>("");
+    // const [meetingNotes, setmeetingNotes] = useState<string>("");
     const scrollToRef = useRef<RefObject<HTMLDivElement>[]>([]);
 
 
@@ -176,7 +176,6 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     };
 
     const passSingleSlideParamenters = async (index: number, prompt: { text: string }) => {
-        console.log(index, 'setting')
         setSelectedAIAction(prompt.text);
         setSelectedAIActionIndex(index);
         setOpenIndex(null);
@@ -488,13 +487,19 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
     }, []);
 
 
-    const toggleMeetingNotes = () => setDisplayMeetingNote(!displayMeetingNote)
-
-    const handleMeetingNotes = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        setmeetingNotes(e.target.value)
+    const toggleMeetingNotes = (index: number) => {
+        const copy = [...slideStates]
+        copy[index].displayMeetingNote = true;
+        setSlideState(copy);
     }
 
-    const generateMeetingNotes = async (slide: Slide) => {
+    const handleMeetingNotes = (e: ChangeEvent<HTMLTextAreaElement>, index: number) => {
+        const copy = [...slideStates]
+        copy[index].meetingNotes = e.target.value;
+        setSlideState(copy);
+    }
+
+    const generateMeetingNotes = async (slide: Slide, index: number) => {
         const payload = GenerateSpeakerMeetingNotes({ slide })
         setgeneratingNotes(true);
 
@@ -510,8 +515,11 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
             const updatedSlide = await EnterPromptSlide(passedValue) as OpenAIResponse
             const result = extractOpenAIResponseContent(updatedSlide)
             console.log(result, 'result')
+            const copy = [...slideStates]
+            copy[index].meetingNotes = result.notes
+            setSlideState(copy);
             setgeneratingNotes(false);
-            setmeetingNotes(result.notes)
+            // setmeetingNotes(result.notes)
         } catch (error) {
             console.log(error)
             setgeneratingNotes(false);
@@ -521,14 +529,14 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div className="flex gap-4 justify-end p-4">
-                <Button variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
+            <div className="flex gap-2 justify-end p-4">
+                <Button variant={'secondary'} className="rounded-lg text-lg bg-white text-black" type="submit">
                     <Swords /> Challenge me
                 </Button>
-                <Button variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
+                <Button variant={'secondary'} className="rounded-lg text-lg bg-white text-black" type="submit">
                     <Volume2 /> Present it to me
                 </Button>
-                <Button variant={'secondary'} className="rounded-lg text-lg bg-secondary text-black shadow-lg" type="submit">
+                <Button variant={'secondary'} className="rounded-lg text-lg bg-white text-black" type="submit">
                     <Download /> Download
                 </Button>
                 <Button onClick={() => router.push("/present")} className="rounded-lg text-lg bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]" type="submit">
@@ -604,44 +612,44 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                     </div>
                                 ) : slide.templateSlide === 'SectionHeader' ? (
                                     <div ref={scrollToRef.current[index]}>
-                                    <div className="relative group" ref={dropdownRef}>
-                                        <DropdownMenu open={openIndex === index}>
-                                            <DropdownMenuTrigger>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
-                                                <DropdownMenuLabel>
-                                                    <div className="flex items-center gap-3">
-                                                        <SparklesIcon className="w-4 h-4 text-primary" />
-                                                        <div className="text-lg">Edit with AI</div>
+                                        <div className="relative group" ref={dropdownRef}>
+                                            <DropdownMenu open={openIndex === index}>
+                                                <DropdownMenuTrigger>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
+                                                    <DropdownMenuLabel>
+                                                        <div className="flex items-center gap-3">
+                                                            <SparklesIcon className="w-4 h-4 text-primary" />
+                                                            <div className="text-lg">Edit with AI</div>
+                                                        </div>
+                                                    </DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <div className="relative">
+                                                        <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
+                                                        <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                                            <PaperPlaneIcon />
+                                                        </Button>
                                                     </div>
-                                                </DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <div className="relative">
-                                                    <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
-                                                    <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
-                                                        <PaperPlaneIcon />
-                                                    </Button>
+                                                    {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
+                                                    <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
+                                                        generateImagesForSlides('SectionHeader')
+                                                    }}><AlignLeft /> &nbsp;Regenerate Image</div>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                            <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
+                                                <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
+                                                    <SparklesIcon className="w-4 h-4 text-primary" />
+                                                    <ChevronDown className="w-4 h-4 text-gray-500" />
                                                 </div>
-                                                {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
-                                                <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
-                                                    generateImagesForSlides('SectionHeader')
-                                                }}><AlignLeft /> &nbsp;Regenerate Image</div>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                        <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
-                                            <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
-                                                <SparklesIcon className="w-4 h-4 text-primary" />
-                                                <ChevronDown className="w-4 h-4 text-gray-500" />
+                                            </div>
+                                            <div key={index} className="shadow-[0_16px_36px_#542fb814]">
+                                                {(selectedIndex === index) && loadingSlideContent && (
+                                                    <div className="absolute flex w-full h-full justify-center items-center bg-neutral-50">
+                                                        <Spinner />
+                                                    </div>)}
+                                                <SectionHeader mode={type} content={slide} />
                                             </div>
                                         </div>
-                                        <div key={index} className="shadow-[0_16px_36px_#542fb814]">
-                                            {(selectedIndex === index) && loadingSlideContent && (
-                                                <div className="absolute flex w-full h-full justify-center items-center bg-neutral-50">
-                                                    <Spinner />
-                                                </div>)}
-                                            <SectionHeader mode={type} content={slide} />
-                                        </div>
-                                    </div>
                                     </div>
                                 ) : slide.templateSlide === 'BulletList' ? (
                                     <div ref={scrollToRef.current[index]}>
@@ -683,93 +691,93 @@ const SlideDeck: React.FC<SlideDeckProps> = ({ type, slides }) => {
                                     </div>
                                 ) : slide.templateSlide === 'ImageWithCaption' ? (
                                     <div ref={scrollToRef.current[index]}>
-                                    <div className="relative group" ref={dropdownRef}>
-                                        <DropdownMenu open={openIndex === index}>
-                                            <DropdownMenuTrigger>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
-                                                <DropdownMenuLabel>
-                                                    <div className="flex items-center gap-3">
-                                                        <SparklesIcon className="w-4 h-4 text-primary" />
-                                                        <div className="text-lg">Edit with AI</div>
+                                        <div className="relative group" ref={dropdownRef}>
+                                            <DropdownMenu open={openIndex === index}>
+                                                <DropdownMenuTrigger>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
+                                                    <DropdownMenuLabel>
+                                                        <div className="flex items-center gap-3">
+                                                            <SparklesIcon className="w-4 h-4 text-primary" />
+                                                            <div className="text-lg">Edit with AI</div>
+                                                        </div>
+                                                    </DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <div className="relative">
+                                                        <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
+                                                        <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                                            <PaperPlaneIcon />
+                                                        </Button>
                                                     </div>
-                                                </DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <div className="relative">
-                                                    <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
-                                                    <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
-                                                        <PaperPlaneIcon />
-                                                    </Button>
+                                                    {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
+                                                    <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
+                                                        generateImagesForSlides('ImageWithCaption')
+                                                    }}><AlignLeft /> &nbsp;Regenerate Image</div>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                            <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
+                                                <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
+                                                    <SparklesIcon className="w-4 h-4 text-primary" />
+                                                    <ChevronDown className="w-4 h-4 text-gray-500" />
                                                 </div>
-                                                {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
-                                                <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
-                                                    generateImagesForSlides('ImageWithCaption')
-                                                }}><AlignLeft /> &nbsp;Regenerate Image</div>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                        <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
-                                            <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
-                                                <SparklesIcon className="w-4 h-4 text-primary" />
-                                                <ChevronDown className="w-4 h-4 text-gray-500" />
+                                            </div>
+                                            <div key={index} className="shadow-[0_16px_36px_#542fb814]">
+                                                {(selectedIndex === index) && loadingSlideContent && (
+                                                    <div className="absolute flex w-full h-full justify-center items-center bg-neutral-50">
+                                                        <Spinner />
+                                                    </div>)}
+                                                <ImageWithCaption mode={type} content={slide} />
                                             </div>
                                         </div>
-                                        <div key={index} className="shadow-[0_16px_36px_#542fb814]">
-                                            {(selectedIndex === index) && loadingSlideContent && (
-                                                <div className="absolute flex w-full h-full justify-center items-center bg-neutral-50">
-                                                    <Spinner />
-                                                </div>)}
-                                            <ImageWithCaption mode={type} content={slide} />
-                                        </div>
-                                    </div>
                                     </div>
                                 ) : slide.templateSlide === 'ClosingSlide' ? (
                                     <div ref={scrollToRef.current[index]}>
-                                    <div className="relative group" ref={dropdownRef}>
-                                        <DropdownMenu open={openIndex === index}>
-                                            <DropdownMenuTrigger>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
-                                                <DropdownMenuLabel>
-                                                    <div className="flex items-center gap-3">
-                                                        <SparklesIcon className="w-4 h-4 text-primary" />
-                                                        <div className="text-lg">Edit with AI</div>
+                                        <div className="relative group" ref={dropdownRef}>
+                                            <DropdownMenu open={openIndex === index}>
+                                                <DropdownMenuTrigger>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="absolute mt-2 min-w-[250px]">
+                                                    <DropdownMenuLabel>
+                                                        <div className="flex items-center gap-3">
+                                                            <SparklesIcon className="w-4 h-4 text-primary" />
+                                                            <div className="text-lg">Edit with AI</div>
+                                                        </div>
+                                                    </DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <div className="relative">
+                                                        <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
+                                                        <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
+                                                            <PaperPlaneIcon />
+                                                        </Button>
                                                     </div>
-                                                </DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <div className="relative">
-                                                    <Input placeholder="Ask AI to..." ref={userPromptInputRef} value={userPromptInput} onChange={(e) => setUserPromptInput(e.target.value)} className="pr-[50px]" />
-                                                    <Button onClick={() => passSingleSlideParamenters(index, { text: userPromptInput })} className="absolute top-0 right-0 rounded-[8px] bg-primary shadow-lg shadow-[rgba(3, 169, 131, 0.6)] hover:bg-[#04e1af] hover:shadow-[#04e1af]">
-                                                        <PaperPlaneIcon />
-                                                    </Button>
+                                                    {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
+                                                    <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
+                                                        generateImagesForSlides('ClosingSlide')
+                                                    }}><AlignLeft /> &nbsp;Regenerate Image</div>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                            <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
+                                                <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
+                                                    <SparklesIcon className="w-4 h-4 text-primary" />
+                                                    <ChevronDown className="w-4 h-4 text-gray-500" />
                                                 </div>
-                                                {editWithAIOptions.map((i, indexx) => <div key={indexx} className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => passSingleSlideParamenters(index, i)}><AlignLeft /> &nbsp;{i.text}</div>)}
-                                                <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-lg font-[300] cursor-pointer hover:bg-neutral-100" onClick={() => {
-                                                    generateImagesForSlides('ClosingSlide')
-                                                }}><AlignLeft /> &nbsp;Regenerate Image</div>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                        <div className="absolute hidden group-hover:block bg-white p-2 rounded shadow-lg text-white">
-                                            <div className="flex gap-2 cursor-pointer" onClick={() => handleToggle(index)}>
-                                                <SparklesIcon className="w-4 h-4 text-primary" />
-                                                <ChevronDown className="w-4 h-4 text-gray-500" />
+                                            </div>
+                                            <div key={index} className="shadow-[0_16px_36px_#542fb814]">
+                                                {(selectedIndex === index) && loadingSlideContent && (
+                                                    <div className="absolute flex w-full h-full justify-center items-center bg-neutral-50">
+                                                        <Spinner />
+                                                    </div>)}
+                                                <ClosingSide mode={type} content={slide} />
                                             </div>
                                         </div>
-                                        <div key={index} className="shadow-[0_16px_36px_#542fb814]">
-                                            {(selectedIndex === index) && loadingSlideContent && (
-                                                <div className="absolute flex w-full h-full justify-center items-center bg-neutral-50">
-                                                    <Spinner />
-                                                </div>)}
-                                            <ClosingSide mode={type} content={slide} />
-                                        </div>
-                                    </div>
                                     </div>
                                 ) : null
                                 }
                                 <div className="mt-5">
-                                    {displayMeetingNote && <Textarea placeholder="Enter your meeting or generate with AI 💫" value={meetingNotes} onChange={handleMeetingNotes} />}
+                                    {slide.displayMeetingNote && <Textarea rows={7} placeholder="Enter your meeting or generate with AI 💫" className="!text-lg" value={slide.meetingNotes} onChange={(e) => handleMeetingNotes(e, index)} />}
                                     <div className="flex justify-end mt-4">
-                                        {!displayMeetingNote && <div className="bg-secondary rounded-full py-1 px-3 flex gap-3 cursor-pointer" onClick={toggleMeetingNotes}><div>Meeting Notes</div></div>}
-                                        {displayMeetingNote && <div className="bg-secondary rounded-full py-1 px-3 flex gap-3 cursor-pointer" onClick={() => generateMeetingNotes(slide)}><div>💫 &nbsp;Generate Meeting Notes</div>{generatingNotes && <Loader2 className="animate-spin text-primary" />}</div>}
+                                        {!slide.displayMeetingNote && <div className="bg-secondary rounded-full py-1 px-3 flex gap-3 cursor-pointer" onClick={() => toggleMeetingNotes(index)}><div>Meeting Notes</div></div>}
+                                        {slide.displayMeetingNote && <div className="bg-secondary rounded-full py-1 px-3 flex gap-3 cursor-pointer" onClick={() => generateMeetingNotes(slide, index)}><div>💫 &nbsp;Generate Meeting Notes</div>{generatingNotes && <Loader2 className="animate-spin text-primary" />}</div>}
                                     </div>
                                 </div>
                             </div>

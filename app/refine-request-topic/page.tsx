@@ -37,11 +37,15 @@ const RefineRequestPrompt: React.FC = () => {
 
         const query = new URLSearchParams(window.location.search);
         const encodedPrompt = query.get('user_prompt');
+        const pages = query.get('pages') || "";
+        const tone = query.get('tone') || "";
+        const output_language = query.get('output_language') || "English";
+        const audience = query.get('audience') || "";
         if (!encodedPrompt) {
             console.error('No user prompt found in the query string');
             return;
         }
-        const userPrompt = atob(encodedPrompt);
+        const userPrompt = { user_prompt: atob(encodedPrompt), pages: atob(pages), tone: atob(tone), output_language: atob(output_language), audience: atob(audience) };
 
         const payload = RefineSlideAIModelEnquiry(userPrompt);
 
