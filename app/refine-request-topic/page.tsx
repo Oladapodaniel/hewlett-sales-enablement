@@ -39,7 +39,7 @@ const RefineRequestPrompt: React.FC = () => {
         const encodedPrompt = query.get('user_prompt');
         const pages = query.get('pages') || "";
         const tone = query.get('tone') || "";
-        const output_language = query.get('output_language') || "English";
+        const output_language = query.get('output_language') || "";
         const audience = query.get('audience') || "";
         if (!encodedPrompt) {
             console.error('No user prompt found in the query string');
