@@ -66,14 +66,14 @@ export const EnterPromptInstructions = ({ user_prompt, pages, tone, output_langu
 };
 
 
-export const RefineSlideAIModelEnquiry = ({ user_prompt, pages, tone, output_language, audience }: EnterPromptInstructionsProps) => {
+export const RefineSlideAIModelEnquiry = ({ user_prompt, audience }: EnterPromptInstructionsProps) => {
   return {
     files: [],
     user_prompt: JSON.stringify({
       messages: [
         {
           role: "system",
-          content: `You are a slide content generator. A user has prompt you to generate a slide deck for presentation based on a topic, Here is the user prompt: "${user_prompt}", they requested you create "${pages}" pages, with "${tone}" tone and "${output_language}" language, with a "${audience}" audience. Based on your understanding of this prompt, ask the user 3 questions to better refine their prompt and make you understand their specific request. Return this questions in JSON format. The questions should include: 'question', 'id'. Stick to the JSON schema. Do not add any extra commentary or text beyond the JSON structure.`
+          content: `You are a slide content generator. A user has prompt you to generate a slide deck for presentation based on a topic, Here is the user prompt: "${user_prompt}", they are presenting this slide to a "${audience}" audience. Based on your understanding of this prompt, ask the user 3 questions to better refine their prompt and make you understand their specific request. Return this questions in JSON format. The questions should include: 'question', 'id'. Stick to the JSON schema. Do not add any extra commentary or text beyond the JSON structure.`
         },
         {
           role: "system",
